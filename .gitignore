@@ -1,0 +1,7 @@
+/.idea
+/app-files/vendor
+/build
+/backup
+
+/doc.md
+/.phpunit.result.cache

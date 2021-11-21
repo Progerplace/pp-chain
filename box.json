@@ -1,0 +1,8 @@
+{
+  "directories": [
+    "app-files"
+  ],
+  "main": "app-files/index.php",
+  "output": "build/pp-chain@0.1.phar",
+  "stub": false
+}

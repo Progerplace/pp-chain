@@ -1,0 +1,6 @@
+{
+    "require": {
+        "joachim-n/case-converter": "^1.0",
+      "ext-json": "*"
+    }
+}
