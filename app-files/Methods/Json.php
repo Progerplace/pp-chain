@@ -34,7 +34,7 @@ class Json extends Method
         return $this->chain;
     }
 
-    public function decodeFields(array $fields): Chain
+    public function decodeFields(...$fields): Chain
     {
         $fields = Utils::argumentsAsArray($fields);
         $this->array = ChainFunc::$json::decodeFields($this->array, $fields);
