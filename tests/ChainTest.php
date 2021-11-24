@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../vendor-local/phpunit.phar';
-require_once __DIR__ . '/../build/pp-chain@0.1.phar';
+require_once __DIR__ . '/../app-files/index.php';
 require_once __DIR__ . '/Data/DataArray.php';
 require_once __DIR__ . '/Data/DataCollection.php';
 
@@ -158,6 +158,21 @@ class ChainTest extends TestCase
 
         $this->assertEquals([3, 2, 1], $res1);
         $this->assertEquals([2 => 3, 1 => 2, 0 => 1], $res2);
+    }
+
+    public function testColumn()
+    {
+        $ar = [$this->array->withKeys, $this->array->withKeys];
+
+        $res1 = Chain::fromArray($ar)->column('s')->array;
+        $this->assertEquals(['second', 'second'], $res1);
+    }
+
+    public function testUnique()
+    {
+        $ar = ['a', 'a', 'b'];
+        $res1 = Chain::fromArray($ar)->unique()->array;
+        $this->assertEquals([0 => 'a', 2 => 'b'], $res1);
     }
 
     public function testFillKeys()

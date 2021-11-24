@@ -34,30 +34,6 @@ class ChainElems extends Method
     }
 
     /**
-     * @return Chain
-     */
-    public function keys(): Chain
-    {
-        foreach ($this->array as $keyElem => $elem) {
-            $this->array[$keyElem] = ChainFunc::keys($this->array[$keyElem]);
-        }
-
-        return $this->chain;
-    }
-
-    /**
-     * @return Chain
-     */
-    public function values(): Chain
-    {
-        foreach ($this->array as $keyElem => $elem) {
-            $this->array[$keyElem] = array_values($this->array[$keyElem]);
-        }
-
-        return $this->chain;
-    }
-
-    /**
      * @param callable $callback fn(mixed $item, mixed $key): bool
      *
      * @return Chain
@@ -80,20 +56,6 @@ class ChainElems extends Method
     {
         foreach ($this->array as $keyElem => $elem) {
             $this->array[$keyElem] = ChainFunc::reject($this->array[$keyElem], $callback);
-        }
-
-        return $this->chain;
-    }
-
-    /**
-     * @param callable $callback fn($a, $b): int
-     *
-     * @return Chain
-     */
-    public function sort(callable $callback): Chain
-    {
-        foreach ($this->array as $keyElem => $elem) {
-            usort($this->array[$keyElem], $callback);
         }
 
         return $this->chain;
@@ -128,15 +90,6 @@ class ChainElems extends Method
         return $this->chain;
     }
 
-    public function reverse(bool $isPreserveKeys = false): Chain
-    {
-        foreach ($this->array as $keyElem => $item) {
-            $this->array[$keyElem] = array_reverse($this->array[$keyElem], $isPreserveKeys);
-        }
-
-        return $this->chain;
-    }
-
     /**
      * @param callable $callback fn($item, $key): string|int
      *
@@ -146,6 +99,57 @@ class ChainElems extends Method
     {
         foreach ($this->array as $keyElem => $item) {
             $this->array[$keyElem] = ChainFunc::fillKeys($this->array[$keyElem], $callback);
+        }
+
+        return $this->chain;
+    }
+
+    /************************************************/
+    /* Обёртки для стандартных функций
+    /************************************************/
+
+    /**
+     * @return Chain
+     */
+    public function keys(): Chain
+    {
+        foreach ($this->array as $keyElem => $elem) {
+            $this->array[$keyElem] = array_keys($this->array[$keyElem]);
+        }
+
+        return $this->chain;
+    }
+
+    /**
+     * @return Chain
+     */
+    public function values(): Chain
+    {
+        foreach ($this->array as $keyElem => $elem) {
+            $this->array[$keyElem] = array_values($this->array[$keyElem]);
+        }
+
+        return $this->chain;
+    }
+
+    /**
+     * @param callable $callback fn($a, $b): int
+     *
+     * @return Chain
+     */
+    public function sort(callable $callback): Chain
+    {
+        foreach ($this->array as $keyElem => $elem) {
+            usort($this->array[$keyElem], $callback);
+        }
+
+        return $this->chain;
+    }
+
+    public function reverse(bool $isPreserveKeys = false): Chain
+    {
+        foreach ($this->array as $keyElem => $item) {
+            $this->array[$keyElem] = array_reverse($this->array[$keyElem], $isPreserveKeys);
         }
 
         return $this->chain;

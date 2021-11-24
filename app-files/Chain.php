@@ -107,28 +107,6 @@ class Chain
     }
 
     /**
-     * Обёртка для array_keys(). Возвращает ключи массива.
-     *
-     * @return Chain
-     */
-    public function keys(): Chain
-    {
-        $this->array = array_keys($this->array);
-
-        return $this;
-    }
-
-    /**
-     * @return Chain
-     */
-    public function values(): Chain
-    {
-        $this->array = array_values($this->array);
-
-        return $this;
-    }
-
-    /**
      * @param callable $callback fn(mixed $item, mixed $key): bool
      *
      * @return $this
@@ -153,20 +131,6 @@ class Chain
     }
 
     /**
-     * Обёртка для usort
-     *
-     * @param callable $callback fn($a, $b): int
-     *
-     * @return $this
-     */
-    public function sort(callable $callback): Chain
-    {
-        usort($this->array, $callback);
-
-        return $this;
-    }
-
-    /**
      * @param callable $callback fn($res, $item, $key): mixed
      * @param mixed    $startVal
      * @param bool     $isChain
@@ -180,13 +144,6 @@ class Chain
         return $isChain
             ? Chain::fromArray($res)
             : $res;
-    }
-
-    public function reverse(bool $isPreserveKeys = false): Chain
-    {
-        $this->array = array_reverse($this->array, $isPreserveKeys);
-
-        return $this;
     }
 
     /**
@@ -209,6 +166,53 @@ class Chain
     public function group(callable $callback): Chain
     {
         $this->array = ChainFunc::group($this->array, $callback);
+
+        return $this;
+    }
+
+    /************************************************/
+    /* Обёртки для стандартных функций
+    /************************************************/
+
+    /**
+     * Обёртка для array_keys(). Возвращает ключи массива.
+     *
+     * @return Chain
+     */
+    public function keys(): Chain
+    {
+        $this->array = array_keys($this->array);
+
+        return $this;
+    }
+
+    /**
+     * @return Chain
+     */
+    public function values(): Chain
+    {
+        $this->array = array_values($this->array);
+
+        return $this;
+    }
+
+    /**
+     * Обёртка для usort
+     *
+     * @param callable $callback fn($a, $b): int
+     *
+     * @return $this
+     */
+    public function sort(callable $callback): Chain
+    {
+        usort($this->array, $callback);
+
+        return $this;
+    }
+
+    public function reverse(bool $isPreserveKeys = false): Chain
+    {
+        $this->array = array_reverse($this->array, $isPreserveKeys);
 
         return $this;
     }

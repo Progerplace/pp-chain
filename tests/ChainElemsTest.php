@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../vendor-local/phpunit.phar';
-require_once __DIR__ . '/../build/pp-chain@0.1.phar';
+require_once __DIR__ . '/../app-files/index.php';
 require_once __DIR__ . '/Data/DataArray.php';
 require_once __DIR__ . '/Data/DataCollection.php';
 
@@ -138,6 +138,23 @@ class ChainElemsTest extends TestCase
         $this->assertEquals([[2 => 3, 1 => 2, 0 => 1], [2 => 3, 1 => 2, 0 => 1]], $res2);
     }
 
+    public function testColumn()
+    {
+        $ar = [$this->array->withKeys, $this->array->withKeys];
+        $cl = [$ar, $ar];
+
+        $res1 = Chain::fromArray($cl)->elems->column('s')->array;
+        $this->assertEquals([['second', 'second'], ['second', 'second']], $res1);
+    }
+
+    public function testUnique()
+    {
+        $ar = ['a', 'a', 'b'];
+        $cl = [$ar, $ar];
+        $res1 = Chain::fromArray($cl)->elems->unique()->array;
+        $this->assertEquals([[0 => 'a', 2 => 'b'], [0 => 'a', 2 => 'b']], $res1);
+    }
+
     public function testFillKeys()
     {
         $res1 = Chain::fromArray($this->collection->number)->elems->fillKeys(fn($item, $key) => $item + 10)->array;
@@ -151,12 +168,18 @@ class ChainElemsTest extends TestCase
     {
         $snake = [$this->array->snakeCase, $this->array->snakeCase];
         $camel = [$this->array->camelCase, $this->array->camelCase];
+        $lower = [$this->array->withKeys, $this->array->withKeys];
+        $upper = [$this->array->withKeysUpper, $this->array->withKeysUpper];
 
         $res1 = Chain::fromArray($snake)->elems->caseKey->snakeToCamel()->array;
         $res2 = Chain::fromArray($snake)->elems->caseKey->camelToSnake()->array;
+        $res3 = Chain::fromArray($lower)->elems->caseKey->toUpper()->array;
+        $res4 = Chain::fromArray($upper)->elems->caseKey->toLower()->array;
 
         $this->assertEquals($camel, $res1);
         $this->assertEquals($snake, $res2);
+        $this->assertEquals($upper, $res3);
+        $this->assertEquals($lower, $res4);
     }
 
     public function testCount()
