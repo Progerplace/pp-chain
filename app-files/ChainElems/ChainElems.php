@@ -1,22 +1,31 @@
 <?php
 
-namespace Ru\Progerplace\Chain;
+namespace Ru\Progerplace\Chain\ChainElems;
 
-use Ru\Progerplace\Chain\ChainElems\Methods\CaseKey;
-use Ru\Progerplace\Chain\ChainElems\Methods\Json;
+
+use Ru\Progerplace\Chain\ChainBase\Chain;
+use Ru\Progerplace\Chain\ChainElems\Aggregate\CaseKey;
+use Ru\Progerplace\Chain\ChainElems\Aggregate\Json;
+use Ru\Progerplace\Chain\ChainElems\Aggregate\FillKeys;
+use Ru\Progerplace\Chain\ChainElems\Aggregate\Sort;
+use Ru\Progerplace\Chain\ChainFunc\ChainFunc;
+use Ru\Progerplace\Chain\Method;
 
 class ChainElems extends Method
 {
     protected array $array;
-    protected Chain $chain;
 
-    public Json    $json;
-    public CaseKey $caseKey;
+    public Json     $json;
+    public CaseKey  $caseKey;
+    public Sort     $sort;
+    public FillKeys $fillKeys;
 
     protected function initFields()
     {
         $this->json = new Json($this->chain, $this->array);
         $this->caseKey = new CaseKey($this->chain, $this->array);
+        $this->sort = new Sort($this->chain, $this->array);
+        $this->fillKeys = new FillKeys($this->chain, $this->array);
     }
 
     /**

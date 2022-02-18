@@ -1,9 +1,9 @@
 <?php
 
-require_once __DIR__ . '/../vendor-local/phpunit.phar';
+namespace Module;
 
-use Ru\Progerplace\Chain\Utils;
 use PHPUnit\Framework\TestCase;
+use Ru\Progerplace\Chain\Utils;
 
 class UtilsTest extends TestCase
 {

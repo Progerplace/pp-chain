@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7e9d38f8a5cb46f65bea21945ca74821",
+    "content-hash": "dd29692e05b4e0b6430b988e537b6187",
     "packages": [
         {
             "name": "joachim-n/case-converter",
@@ -51,7 +51,9 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "ext-json": "*"
+    },
     "platform-dev": [],
     "plugin-api-version": "2.1.0"
 }

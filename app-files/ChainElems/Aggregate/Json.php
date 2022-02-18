@@ -1,21 +1,14 @@
 <?php
 
-namespace Ru\Progerplace\Chain\ChainElems\Methods;
+namespace Ru\Progerplace\Chain\ChainElems\Aggregate;
 
-use Ru\Progerplace\Chain\Chain;
+use Ru\Progerplace\Chain\ChainBase\Chain;
+use Ru\Progerplace\Chain\ChainFunc\ChainFunc;
 use Ru\Progerplace\Chain\Method;
-use Ru\Progerplace\Chain\Methods\Json as JsonChain;
 use Ru\Progerplace\Chain\Utils;
 
 class Json extends Method
 {
-    protected JsonChain $jsonChain;
-
-    protected function initFields()
-    {
-        $this->jsonChain = new JsonChain($this->chain, $this->array);
-    }
-
     /**
      * @param string|string[] ...$fieldsNames
      *
@@ -26,7 +19,7 @@ class Json extends Method
         $fieldsNames = Utils::argumentsAsArray($fieldsNames);
 
         foreach ($this->array as $keyElem => $item) {
-            $this->array[$keyElem] = Chain::fromArray($this->array[$keyElem])->json->encodeFields($fieldsNames)->array;
+            $this->array[$keyElem] = ChainFunc::$json::encodeFields($item, $fieldsNames);
         }
 
         return $this->chain;
@@ -40,7 +33,7 @@ class Json extends Method
     public function encodeBy(callable $callback): Chain
     {
         foreach ($this->array as $keyElem => $item) {
-            $this->array[$keyElem] = Chain::fromArray($this->array[$keyElem])->json->encodeBy($callback)->array;
+            $this->array[$keyElem] = ChainFunc::$json::encodeBy($item, $callback);
         }
 
         return $this->chain;
@@ -56,7 +49,7 @@ class Json extends Method
         $fieldsNames = Utils::argumentsAsArray($fieldsNames);
 
         foreach ($this->array as $keyElem => $item) {
-            $this->array[$keyElem] = Chain::fromArray($this->array[$keyElem])->json->decodeFields($fieldsNames)->array;
+            $this->array[$keyElem] = ChainFunc::$json::decodeFields($item, $fieldsNames);
         }
 
         return $this->chain;
@@ -70,7 +63,7 @@ class Json extends Method
     public function decodeBy(callable $callback): Chain
     {
         foreach ($this->array as $keyElem => $item) {
-            $this->array[$keyElem] = Chain::fromArray($this->array[$keyElem])->json->decodeBy($callback)->array;
+            $this->array[$keyElem] = ChainFunc::$json::decodeBy($item, $callback);
         }
 
         return $this->chain;

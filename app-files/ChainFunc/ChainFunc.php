@@ -1,10 +1,11 @@
 <?php
 
-namespace Ru\Progerplace\Chain;
+namespace Ru\Progerplace\Chain\ChainFunc;
 
-use Ru\Progerplace\Chain\ChainFunc\CaseKey;
-use Ru\Progerplace\Chain\ChainFunc\FillKeys;
-use Ru\Progerplace\Chain\ChainFunc\Json;
+use Ru\Progerplace\Chain\ChainFunc\Aggregate\FillKeys;
+use Ru\Progerplace\Chain\ChainFunc\Aggregate\CaseKey;
+use Ru\Progerplace\Chain\ChainFunc\Aggregate\Json;
+use Ru\Progerplace\Chain\ChainFunc\Aggregate\Sort;
 
 class ChainFunc
 {
@@ -23,6 +24,11 @@ class ChainFunc
      */
     public static $json = Json::class;
 
+    /**
+     * @var Sort
+     */
+    public static $sort = Sort::class;
+
     public static function map(array $array, callable $callback): array
     {
         foreach ($array as $key => $item) {
@@ -40,6 +46,31 @@ class ChainFunc
     public static function values(array $array): array
     {
         return array_values($array);
+    }
+
+    public static function column(array $array, $field, $index = null): array
+    {
+        return array_column($array, $field, $index);
+    }
+
+    public static function unique(array $array): array
+    {
+        return array_unique($array);
+    }
+
+    public static function reverse(array $array): array
+    {
+        return array_reverse($array);
+    }
+
+    public static function count(array $array): int
+    {
+        return count($array);
+    }
+
+    public static function isEmpty(array $array): bool
+    {
+        return empty($array);
     }
 
     public static function filter(array $array, callable $callback): array
@@ -86,6 +117,13 @@ class ChainFunc
         return null;
     }
 
+    /**
+     * @param array    $array
+     * @param callable $callback
+     * @param mixed    $startVal
+     *
+     * @return mixed
+     */
     public static function reduce(array $array, callable $callback, $startVal = [])
     {
         $res = $startVal;
@@ -124,30 +162,5 @@ class ChainFunc
         }
 
         return $res;
-    }
-
-    public static function column(array $array, $field): array
-    {
-        return array_column($array, $field);
-    }
-
-    public static function unique(array $array): array
-    {
-        return array_unique($array);
-    }
-
-    public static function reverse(array $array): array
-    {
-        return array_reverse($array);
-    }
-
-    public static function count(array $array): int
-    {
-        return count($array);
-    }
-
-    public static function isEmpty(array $array): bool
-    {
-        return empty($array);
     }
 }

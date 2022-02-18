@@ -1,6 +1,6 @@
 <?php
 
-namespace Ru\Progerplace\Chain\ChainFunc;
+namespace Ru\Progerplace\Chain\ChainFunc\Aggregate;
 
 use Ru\Progerplace\Chain\Utils;
 

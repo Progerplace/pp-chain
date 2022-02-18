@@ -1,18 +1,24 @@
 <?php
 
-namespace Ru\Progerplace\Chain;
+namespace Ru\Progerplace\Chain\ChainBase;
 
-use Ru\Progerplace\Chain\Methods\CaseKey;
-use Ru\Progerplace\Chain\Methods\FillKeys;
-use Ru\Progerplace\Chain\Methods\Json;
+
+use Ru\Progerplace\Chain\ChainBase\Aggregate\Sort;
+use Ru\Progerplace\Chain\ChainElems\ChainElems;
+use Ru\Progerplace\Chain\ChainBase\Aggregate\Json;
+use Ru\Progerplace\Chain\ChainBase\Aggregate\CaseKey;
+use Ru\Progerplace\Chain\ChainBase\Aggregate\FillKeys;
+use Ru\Progerplace\Chain\ChainFunc\ChainFunc;
 
 class Chain
 {
-    public array      $array = [];
+    public array $array = [];
+
     public ChainElems $elems;
     public Json       $json;
     public CaseKey    $caseKey;
     public FillKeys   $fillKeys;
+    public Sort       $sort;
 
 
     public function __construct(array $array)
@@ -22,16 +28,37 @@ class Chain
         $this->json = new Json($this, $this->array);
         $this->caseKey = new CaseKey($this, $this->array);
         $this->fillKeys = new FillKeys($this, $this->array);
+        $this->sort = new Sort($this, $this->array);
     }
 
     /************************************************/
     /* Создание
     /************************************************/
 
+
+    public static function from(?iterable $var, $default = []): Chain
+    {
+        if (is_null($var)) {
+            return new static($default);
+        }
+
+        if (is_array($var)) {
+            return new static($var);
+        }
+
+        $array = [];
+        foreach ($var as $item) {
+            $array[] = $item;
+        }
+
+        return new static($array);
+    }
+
     /**
      * @param array $array
      *
      * @return Chain
+     * @deprecated - использовать метод from
      */
     public static function fromArray(array $array): Chain
     {
@@ -142,7 +169,7 @@ class Chain
         $res = ChainFunc::reduce($this->array, $callback, $startVal);
 
         return $isChain
-            ? Chain::fromArray($res)
+            ? Chain::from($res)
             : $res;
     }
 

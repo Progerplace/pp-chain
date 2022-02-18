@@ -1,8 +1,7 @@
 <?php
 
-namespace Data;
 
-class DataArray
+class Data
 {
     public string $strDelimiter = ',';
 

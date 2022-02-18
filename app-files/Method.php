@@ -2,6 +2,8 @@
 
 namespace Ru\Progerplace\Chain;
 
+use Ru\Progerplace\Chain\ChainBase\Chain;
+
 abstract class Method
 {
     protected array $array;

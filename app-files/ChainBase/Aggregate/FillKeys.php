@@ -1,9 +1,9 @@
 <?php
 
-namespace Ru\Progerplace\Chain\Methods;
+namespace Ru\Progerplace\Chain\ChainBase\Aggregate;
 
-use Ru\Progerplace\Chain\Chain;
-use Ru\Progerplace\Chain\ChainFunc;
+use Ru\Progerplace\Chain\ChainBase\Chain;
+use Ru\Progerplace\Chain\ChainFunc\ChainFunc;
 use Ru\Progerplace\Chain\Method;
 
 class FillKeys extends Method
