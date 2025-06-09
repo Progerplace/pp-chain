@@ -35,7 +35,6 @@ class Chain
     /* Создание
     /************************************************/
 
-
     public static function from(?iterable $var, $default = []): Chain
     {
         if (is_null($var)) {
