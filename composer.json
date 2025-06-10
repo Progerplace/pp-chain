@@ -1,0 +1,27 @@
+{
+  "name": "progerplace/chain",
+  "autoload": {
+    "psr-4": {
+      "Ru\\Progerplace\\Chain\\": "app-files/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Progerplace",
+      "email": "info@progerplace.ru"
+    }
+  ],
+  "require": {
+    "ext-json": "*",
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "erusev/parsedown": "^1.7",
+    "imangazaliev/didom": "^2.0",
+    "cocur/slugify": "^4.6",
+    "phpunit/phpunit": "^11.5",
+    "phpowermove/docblock": "^4.0"
+  },
+  "config": {
+  }
+}

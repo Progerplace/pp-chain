@@ -1,7 +1,5 @@
 /.idea
-/app-files/vendor
-/build
-/backup
+/.data-project
+/vendor/
 
-/doc.md
 /.phpunit.result.cache

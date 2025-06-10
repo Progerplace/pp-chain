@@ -1,11 +1,12 @@
 {
   "directories": [
-    "app-files"
+    "app-files",
+    "vendor"
   ],
   "files": [
     "meta.json"
   ],
   "main": "app-files/index.php",
-  "output": "build/pp-chain@0.1.phar",
+  "output": ".data-project/dist/pp-asset.phar",
   "stub": false
 }
