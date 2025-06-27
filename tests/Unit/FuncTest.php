@@ -82,7 +82,7 @@ class FuncTest extends TestCase
     {
         $this->assertEquals(
             ['c' => 3],
-            Func::rejectValues(['a' => 1, 'b' => 2, 'c' => 3], 1, '2')
+            Func::rejectValues(['a' => 1, 'b' => 2, 'c' => 3], 1, 2)
         );
     }
 
@@ -91,14 +91,6 @@ class FuncTest extends TestCase
         $this->assertEquals(
             [1, 2],
             Func::values($this->flat)
-        );
-    }
-
-    public function testValuesGetList(): void
-    {
-        $this->assertEquals(
-            [1, 2],
-            Func::valuesGetList($this->flat)
         );
     }
 
@@ -112,14 +104,6 @@ class FuncTest extends TestCase
         $this->assertEquals(
             [2 => 3, 1 => 2, 0 => 1],
             Func::reverse([1, 2, 3], true)
-        );
-    }
-
-    public function testKeysGetList(): void
-    {
-        $this->assertEquals(
-            ['a', 'b'],
-            Func::keysGetList($this->flat)
         );
     }
 
@@ -239,6 +223,7 @@ class FuncTest extends TestCase
         $arr = [1, 2, 3];
         $this->assertTrue(Func::isHasValue($arr, 3, 4));
         $this->assertFalse(Func::isHasValue($arr, 30, 40));
+        $this->assertFalse(Func::isHasValue($arr, '3', '4'));
     }
 
     public function testIsFieldHasValue(): void
@@ -414,7 +399,7 @@ class FuncTest extends TestCase
     {
         $this->assertEquals(
             ['a' => 1, 'b' => 2],
-            Func::filterValues(['a' => 1, 'b' => 2, 'c' => 3], 1, '2')
+            Func::filterValues(['a' => 1, 'b' => 2, 'c' => 3], 1, 2)
         );
     }
 

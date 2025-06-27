@@ -18,10 +18,18 @@ class ChainFuncJson
     }
 
     /**
-     * Подробности {@see Func::jsonEncodeFields())}
+     * Кодировать в json поля с перечисленными ключами. Для json задан флаг `JSON_UNESCAPED_UNICODE`.
+     *
+     * ```
+     * Cf::from(['a'=>['f'=>1], 'b'=>['f'=>2], 'c'=>['f'=>3]])->json->encodeFields('a', 'b');
+     * // ['a'=>'{"f":1}','b'=>'{"f":2}', 'c'=>['f'=>3]]
+     * ```
      *
      * @param string|int ...$keys
      * @return array
+     *
+     * @see ChainJson::encodeFields()
+     * @see Func::jsonEncodeFields()
      */
     public function encodeFields(...$keys): array
     {
@@ -29,10 +37,18 @@ class ChainFuncJson
     }
 
     /**
-     * Подробности {@see Func::jsonEncodeBy())}
+     * Кодировать в json поля, для который `$callback` вернул `true`. Для json задан флаг `JSON_UNESCAPED_UNICODE`.
+     *
+     * ```
+     * Cf::from(['a'=>['f'=>1], 'b'=>['f'=>2], 'c'=>['f'=>3]])->json->encodeBy(fn(string $item, string $key) => $item === ['f' => 1] || $key === 'b');
+     * // ['a'=>'{"f":1}','b'=>'{"f":2}', 'c'=>['f'=>3]]
+     * ```
      *
      * @param callable $callback
      * @return array
+     *
+     * @see ChainJson::encodeBy()
+     * @see Func::jsonEncodeBy()
      */
     public function encodeBy(callable $callback): array
     {
@@ -40,10 +56,18 @@ class ChainFuncJson
     }
 
     /**
-     * Подробности {@see Func::jsonDecodeFields())}
+     * Декодировать из json поля с перечисленными ключами.
+     *
+     * ```
+     * Cf::from(['a'=>'{"f":1}', 'b'=>'{"f":2}', 'c'=>'{"f":3}'])->json->decodeFields('a', 'b');
+     * // ['a'=>['f'=>1], 'b'=>['f'=>2], 'c'=>'{"f":3}']
+     * ```
      *
      * @param string|int ...$keys
      * @return array
+     *
+     * @see ChainJson::decodeFields()
+     * @see Func::jsonDecodeFields()
      */
     public function decodeFields(...$keys): array
     {
@@ -51,10 +75,18 @@ class ChainFuncJson
     }
 
     /**
-     * Подробности {@see Func::jsonDecodeBy())}
+     * Декодировать из json поля, для которых `$callback` вернул `true`.
+     *
+     * ```
+     * Cf::from(['a'=>'{"f":1}', 'b'=>'{"f":2}', 'c'=>'{"f":3}'])->json->decodeBy(fn(string $item, string $key) => $item === '{"f":1}' || $key === 'b');
+     * // ['a'=>['f'=>1], 'b'=>['f'=>2], 'c'=>'{"f":3}']
+     * ```
      *
      * @param callable $callback
      * @return array
+     *
+     * @see ChainJson::decodeBy()
+     * @see Func::jsonDecodeBy()
      */
     public function decodeBy(callable $callback): array
     {

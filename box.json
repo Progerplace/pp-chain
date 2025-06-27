@@ -7,6 +7,6 @@
     "meta.json"
   ],
   "main": "app-files/index.php",
-  "output": ".data-project/dist/pp-asset.phar",
+  "output": ".data-project/dist/pp-chain.phar",
   "stub": false
 }

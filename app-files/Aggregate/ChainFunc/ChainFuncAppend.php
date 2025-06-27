@@ -19,10 +19,22 @@ class ChainFuncAppend
     }
 
     /**
-     * Подробности {@see Func::appendMerge()}
+     * Добавить элементы в конец коллекции. Если элемент итерируемый - то будет выполнено слияние. Неитерируемые элементы будут добавлены как есть.
      *
+     * ```
+     * $arr = [1, 2];
+     *
+     * Cf::from($arr)->append->merge(3, [4, 5]);
+     * // [1, 2, 3, 4, 5]
+     *
+     * Ch::from($arr)->append->merge(3, [4, 5, [6, 7]]);
+     * // [1, 2, 3, 4, 5, [6, 7]]
+     * ```
      * @param mixed ...$items
      * @return array
+     *
+     * @see ChainFuncAppend::merge()
+     * @see Func::mergeAppend()
      */
     public function merge(...$items): array
     {
@@ -30,10 +42,20 @@ class ChainFuncAppend
     }
 
     /**
-     * Подробности {@see Func::appendMergeFromJson()}
+     * Декодировать json и добавить в конец массива (с распаковкой итерируемых элементов).
+     *
+     * ```
+     * $arr = [1, 2];
+     *
+     * Cf::from($arr)->append->mergeFromJson('[3, 4, 5, [6, 7]]');
+     * // [1, 2, 3, 4, 5, [6, 7]]
+     * ```
      *
      * @param string $json
      * @return array
+     *
+     * @see ChainFuncAppend::mergeFromJson()
+     * @see Func::appendMergeFromJson()
      */
     public function mergeFromJson(string $json): array
     {
@@ -41,11 +63,21 @@ class ChainFuncAppend
     }
 
     /**
-     * Подробности {@see Func::appendMergeFromString()}
+     * Конвертировать строку в массив и добавить в конец массива (с распаковкой итерируемых элементов).
+     *
+     * ```
+     * $arr = [1, 2];
+     *
+     * Cf::from($arr)->append->mergeFromString('3,4,5', ',');
+     * // [1, 2, 3, 4, 5]
+     * ```
      *
      * @param string $str
      * @param string $delimiter
      * @return array
+     *
+     * @see ChainAppend::mergeFromString()
+     * @see Func::appendMergeFromString()
      */
     public function mergeFromString(string $str, string $delimiter): array
     {

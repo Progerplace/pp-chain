@@ -33,9 +33,9 @@ final class ChainTest extends TestCase
         'a' => [
             'a.a' => [
                 'a.a.a' => 1,
-                'a.a.b' => 2
-            ]
-        ]
+                'a.a.b' => 2,
+            ],
+        ],
     ];
     protected array $nestedDepth        = [
         'a' => [
@@ -46,7 +46,7 @@ final class ChainTest extends TestCase
         'b' => [
             'b.a' => ['b.a.a' => 0, 'b.a.b' => 2, 'b.a.c' => 3],
             'b.b' => ['b.b.a' => 10, 'b.b.b' => 11, 'b.b.c' => null],
-        ]
+        ],
     ];
 
     protected array $case = [
@@ -80,7 +80,7 @@ final class ChainTest extends TestCase
 
         $this->assertEquals(
             $this->flatJson,
-            Chain::from($this->flat)->toJson()
+            Chain::from($this->flat)->toJson(),
         );
 
         $this->assertEqualsMultiple(
@@ -97,12 +97,12 @@ final class ChainTest extends TestCase
 
         $this->assertEquals(
             $this->flatJson,
-            Chain::from($this->flat)->toJson()
+            Chain::from($this->flat)->toJson(),
         );
 
         $this->assertEquals(
             $this->simpleString,
-            Chain::from($this->simple)->toString(',')
+            Chain::from($this->simple)->toString(','),
         );
 
         $this->assertEqualsMultiple(
@@ -125,9 +125,9 @@ final class ChainTest extends TestCase
                 'a' => [
                     'a.a' => [
                         'a.a.a' => 6,
-                        'a.a.b' => 7
-                    ]
-                ]
+                        'a.a.b' => 7,
+                    ],
+                ],
             ],
             Chain::from($this->nestedDepthSingled)->elems->elems->map(fn(int $item) => $item + 5)->toArray(),
             ChainFunc::from($this->nestedDepthSingled)->elems->elems->map(fn(int $item) => $item + 5),
@@ -166,35 +166,35 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3]
-            ]
+                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => ['c' => 3]
-                ]
+                    'a.a' => ['c' => 3],
+                ],
             ],
             Chain::from($arr)->elems->elems->reject(fn(int $item, string $key) => $item < 2 || $key == 'b')->toArray(),
             ChainFunc::from($arr)->elems->elems->reject(fn(int $item, string $key) => $item < 2 || $key == 'b'),
             Chain::from($arr)->elems->elems->reject->keys('a', 'b')->toArray(),
             ChainFunc::from($arr)->elems->elems->reject->keys('a', 'b'),
-            Chain::from($arr)->elems->elems->reject->values(1, '2')->toArray(),
-            ChainFunc::from($arr)->elems->elems->reject->values(1, '2'),
+            Chain::from($arr)->elems->elems->reject->values(1, 2)->toArray(),
+            ChainFunc::from($arr)->elems->elems->reject->values(1, 2),
         );
 
         $arr2 = [
             'a' => [
-                'a.a' => [null, 1, ""]
-            ]
+                'a.a' => [null, 1, ""],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1 => 1]
-                ]
+                    'a.a' => [1 => 1],
+                ],
             ],
             Chain::from($arr2)->elems->elems->reject->empty()->toArray(),
             ChainFunc::from($arr2)->elems->elems->reject->empty(),
@@ -202,8 +202,8 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1 => 1, 2 => ""]
-                ]
+                    'a.a' => [1 => 1, 2 => ""],
+                ],
             ],
             Chain::from($arr2)->elems->elems->reject->null()->toArray(),
             ChainFunc::from($arr2)->elems->elems->reject->null(),
@@ -221,30 +221,11 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1, 2]
-                ]
+                    'a.a' => [1, 2],
+                ],
             ],
             Chain::from($this->nestedDepthSingled)->elems->elems->values()->toArray(),
             ChainFunc::from($this->nestedDepthSingled)->elems->elems->values(),
-        );
-    }
-
-    public function testValuesGetList(): void
-    {
-        $this->assertEqualsMultiple(
-            Func::values($this->flat),
-            Chain::from($this->flat)->values->getList(),
-            ChainFunc::from($this->flat)->values->getList(),
-        );
-
-        $this->assertEqualsMultiple(
-            [
-                'a' => [
-                    'a.a' => [1, 2]
-                ]
-            ],
-            Chain::from($this->nestedDepthSingled)->elems->elems->values->getList()->toArray(),
-            ChainFunc::from($this->nestedDepthSingled)->elems->elems->values->getList(),
         );
     }
 
@@ -257,13 +238,19 @@ final class ChainTest extends TestCase
         );
 
         $this->assertEqualsMultiple(
+            Func::reverse($this->flat, true),
+            Chain::from($this->flat)->reverse(true)->toArray(),
+            ChainFunc::from($this->flat)->reverse(true),
+        );
+
+        $this->assertEqualsMultiple(
             [
                 'a' => [
                     'a.a' => [
                         'a.a.b' => 2,
                         'a.a.a' => 1,
-                    ]
-                ]
+                    ],
+                ],
             ],
             Chain::from($this->nestedDepthSingled)->elems->elems->reverse()->toArray(),
             ChainFunc::from($this->nestedDepthSingled)->elems->elems->reverse(),
@@ -274,9 +261,7 @@ final class ChainTest extends TestCase
     {
         // keys и keysGetList
         $this->assertEqualsMultiple(
-            Func::keysGetList($this->flat),
-            Chain::from($this->flat)->keys->getList(),
-            ChainFunc::from($this->flat)->keys->getList(),
+            Func::keys($this->flat),
             Chain::from($this->flat)->keys()->toArray(),
             ChainFunc::from($this->flat)->keys(),
         );
@@ -287,11 +272,9 @@ final class ChainTest extends TestCase
                     'a.a' => [
                         'a.a.a',
                         'a.a.b',
-                    ]
-                ]
+                    ],
+                ],
             ],
-            Chain::from($this->nestedDepthSingled)->elems->elems->keys->getList()->toArray(),
-            ChainFunc::from($this->nestedDepthSingled)->elems->elems->keys->getList(),
             Chain::from($this->nestedDepthSingled)->elems->elems->keys()->toArray(),
             ChainFunc::from($this->nestedDepthSingled)->elems->elems->keys(),
         );
@@ -307,9 +290,9 @@ final class ChainTest extends TestCase
             'a' => [
                 'a.a' => [
                     'a.a.a' => 1,
-                    'a.a.b' => 2
-                ]
-            ]
+                    'a.a.b' => 2,
+                ],
+            ],
         ];
 
         $this->assertEqualsMultiple(
@@ -317,9 +300,9 @@ final class ChainTest extends TestCase
                 'a' => [
                     'a.a' => [
                         'a.a.a1' => 1,
-                        'a.a.b2' => 2
-                    ]
-                ]
+                        'a.a.b2' => 2,
+                    ],
+                ],
             ],
             Chain::from($arr)->elems->elems->keys->map(fn(string $key, int $val) => $key . $val)->toArray(),
             ChainFunc::from($arr)->elems->elems->keys->map(fn(string $key, int $val) => $key . $val),
@@ -343,8 +326,8 @@ final class ChainTest extends TestCase
                 'a.a' => [
                     ['id' => 10, 'val' => 'a'],
                     ['id' => 20, 'val' => 'b'],
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->assertEqualsMultiple(
@@ -353,8 +336,8 @@ final class ChainTest extends TestCase
                     'a.a' => [
                         10 => ['id' => 10, 'val' => 'a'],
                         20 => ['id' => 20, 'val' => 'b'],
-                    ]
-                ]
+                    ],
+                ],
             ],
             Chain::from($arr)->elems->elems->keys->fromField('id')->toArray(),
             ChainFunc::from($arr)->elems->elems->keys->fromField('id'),
@@ -371,7 +354,7 @@ final class ChainTest extends TestCase
         $arr = [
             'a' => [
                 'a.a' => ['a' => 10, 'b' => 'a'],
-                'a.b' => ['a' => 10, 'b' => 'a']
+                'a.b' => ['a' => 10, 'b' => 'a'],
             ],
         ];
 
@@ -380,7 +363,7 @@ final class ChainTest extends TestCase
                 'a' => [
                     'a.a' => 'b',
                     'a.b' => 'b',
-                ]
+                ],
             ],
             Chain::from($arr)->elems->elems->keys->get(1)->toArray(),
             ChainFunc::from($arr)->elems->elems->keys->get(1),
@@ -398,7 +381,7 @@ final class ChainTest extends TestCase
                 'a' => [
                     'a.a' => 'a',
                     'a.b' => 'a',
-                ]
+                ],
             ],
             Chain::from($arr)->elems->elems->keys->getFirst()->toArray(),
             ChainFunc::from($arr)->elems->elems->keys->getFirst(),
@@ -416,7 +399,7 @@ final class ChainTest extends TestCase
                 'a' => [
                     'a.a' => 'b',
                     'a.b' => 'b',
-                ]
+                ],
             ],
             Chain::from($arr)->elems->elems->keys->getLast()->toArray(),
             ChainFunc::from($arr)->elems->elems->keys->getLast(),
@@ -437,9 +420,9 @@ final class ChainTest extends TestCase
             'a' => [
                 'a.a' => [
                     'a.a.a' => 1,
-                    'a.a.b' => 1
-                ]
-            ]
+                    'a.a.b' => 1,
+                ],
+            ],
         ];
 
         $this->assertEqualsMultiple(
@@ -447,8 +430,8 @@ final class ChainTest extends TestCase
                 'a' => [
                     'a.a' => [
                         'a.a.a' => 1,
-                    ]
-                ]
+                    ],
+                ],
             ],
             Chain::from($arrDeep)->elems->elems->unique()->toArray(),
             ChainFunc::from($arrDeep)->elems->elems->unique(),
@@ -504,15 +487,15 @@ final class ChainTest extends TestCase
         $arr = [
             'a.a' => [
                 'a.a.a' => [1, 2, 3],
-                'a.a.b' => [1, 2]
-            ]
+                'a.a.b' => [1, 2],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a.a' => [
                     'a.a.a' => 3,
-                    'a.a.b' => 2
+                    'a.a.b' => 2,
                 ],
             ],
             Chain::from($arr)->elems->elems->count()->toArray(),
@@ -555,18 +538,18 @@ final class ChainTest extends TestCase
             'a' => [
                 'a.a' => [
                     'a.a.a' => ['f' => 1],
-                    'a.a.b' => ['f' => 2]
-                ]
-            ]
+                    'a.a.b' => ['f' => 2],
+                ],
+            ],
         ];
         $this->assertEqualsMultiple(
             [
                 'a' => [
                     'a.a' => [
                         'a.a.a' => '{"f":1}',
-                        'a.a.b' => ['f' => 2]
-                    ]
-                ]
+                        'a.a.b' => ['f' => 2],
+                    ],
+                ],
             ],
             Chain::from($arrDeep)->elems->elems->json->encodeFields('a.a.a')->toArray(),
             Chain::from($arrDeep)->elems->elems->json->encodeBy(fn($item, $key) => $key === 'a.a.a')->toArray(),
@@ -603,15 +586,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [1, 2]
-            ]
+                'a.a' => [1, 2],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1, 2, 3, 4, 5]
-                ]
+                    'a.a' => [1, 2, 3, 4, 5],
+                ],
             ],
             Chain::from($arr)->elems->elems->append(3, 4, 5)->toArray(),
             ChainFunc::from($arr)->elems->elems->append(3, 4, 5),
@@ -619,8 +602,8 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1, 2, 3, 4, [5]]
-                ]
+                    'a.a' => [1, 2, 3, 4, [5]],
+                ],
             ],
             Chain::from($arr)->elems->elems->append->merge(3, [4, [5]])->toArray(),
             ChainFunc::from($arr)->elems->elems->append->merge(3, [4, [5]]),
@@ -628,8 +611,8 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1, 2, 3, 4, 5, [6, 7]]
-                ]
+                    'a.a' => [1, 2, 3, 4, 5, [6, 7]],
+                ],
             ],
             Chain::from($arr)->elems->elems->append->mergeFromJson('[3,4,5,[6,7]]')->toArray(),
             ChainFunc::from($arr)->elems->elems->append->mergeFromJson('[3,4,5,[6,7]]'),
@@ -637,8 +620,8 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1, 2, 3, 4, 5]
-                ]
+                    'a.a' => [1, 2, 3, 4, 5],
+                ],
             ],
             Chain::from($arr)->elems->elems->append->mergeFromString('3,4,5', ',')->toArray(),
             ChainFunc::from($arr)->elems->elems->append->mergeFromString('3,4,5', ','),
@@ -673,15 +656,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [4, 5]
-            ]
+                'a.a' => [4, 5],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1, 2, 3, 4, 5]
-                ]
+                    'a.a' => [1, 2, 3, 4, 5],
+                ],
             ],
             Chain::from($arr)->elems->elems->prepend(1, 2, 3)->toArray(),
             ChainFunc::from($arr)->elems->elems->prepend(1, 2, 3),
@@ -689,8 +672,8 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1, 2, [3], 4, 5]
-                ]
+                    'a.a' => [1, 2, [3], 4, 5],
+                ],
             ],
             Chain::from($arr)->elems->elems->prepend->merge(1, [2, [3]])->toArray(),
             ChainFunc::from($arr)->elems->elems->prepend->merge(1, [2, [3]]),
@@ -698,8 +681,8 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1, 2, [3], 4, 5]
-                ]
+                    'a.a' => [1, 2, [3], 4, 5],
+                ],
             ],
             Chain::from($arr)->elems->elems->prepend->mergeFromJson('[1,2,[3]]')->toArray(),
             ChainFunc::from($arr)->elems->elems->prepend->mergeFromJson('[1,2,[3]]'),
@@ -707,8 +690,8 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1, 2, 3, 4, 5]
-                ]
+                    'a.a' => [1, 2, 3, 4, 5],
+                ],
             ],
             Chain::from($arr)->elems->elems->prepend->mergeFromString('1,2,3', ',')->toArray(),
             ChainFunc::from($arr)->elems->elems->prepend->mergeFromString('1,2,3', ','),
@@ -728,22 +711,22 @@ final class ChainTest extends TestCase
             ChainFunc::from($this->flat)->filter->keys('a', 'b'),
         );
         $this->assertEqualsMultiple(
-            Func::filterValues($this->flat, 1, '2'),
-            Chain::from($this->flat)->filter->values(1, '2')->toArray(),
-            ChainFunc::from($this->flat)->filter->values(1, '2'),
+            Func::filterValues($this->flat, 1, 2),
+            Chain::from($this->flat)->filter->values(1, 2)->toArray(),
+            ChainFunc::from($this->flat)->filter->values(1, 2),
         );
 
         $arr = [
             'a' => [
-                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3]
-            ]
+                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => ['c' => 3]
-                ]
+                    'a.a' => ['c' => 3],
+                ],
             ],
             Chain::from($arr)->elems->elems->filter(fn(int $item, string $key) => $item > 1 && $key !== 'b')->toArray(),
             ChainFunc::from($arr)->elems->elems->filter(fn(int $item, string $key) => $item > 1 && $key !== 'b'),
@@ -808,15 +791,15 @@ final class ChainTest extends TestCase
         foreach ($this->case as $item) {
             $arr = [
                 'a' => [
-                    'a.a' => $item
-                ]
+                    'a.a' => $item,
+                ],
             ];
 
             $this->assertEqualsMultiple(
                 [
                     'a' => [
-                        'a.a' => $this->case['camel']
-                    ]
+                        'a.a' => $this->case['camel'],
+                    ],
                 ],
                 Chain::from($arr)->elems->elems->keys->case->toCamel()->toArray(),
                 ChainFunc::from($arr)->elems->elems->keys->case->toCamel(),
@@ -826,15 +809,15 @@ final class ChainTest extends TestCase
         foreach ($this->case as $item) {
             $arr = [
                 'a' => [
-                    'a.a' => $item
-                ]
+                    'a.a' => $item,
+                ],
             ];
 
             $this->assertEqualsMultiple(
                 [
                     'a' => [
-                        'a.a' => $this->case['paskal']
-                    ]
+                        'a.a' => $this->case['paskal'],
+                    ],
                 ],
                 Chain::from($arr)->elems->elems->keys->case->toPaskal()->toArray(),
                 ChainFunc::from($arr)->elems->elems->keys->case->toPaskal(),
@@ -844,15 +827,15 @@ final class ChainTest extends TestCase
         foreach ($this->case as $item) {
             $arr = [
                 'a' => [
-                    'a.a' => $item
-                ]
+                    'a.a' => $item,
+                ],
             ];
 
             $this->assertEqualsMultiple(
                 [
                     'a' => [
-                        'a.a' => $this->case['snake']
-                    ]
+                        'a.a' => $this->case['snake'],
+                    ],
                 ],
                 Chain::from($arr)->elems->elems->keys->case->toSnake()->toArray(),
                 ChainFunc::from($arr)->elems->elems->keys->case->toSnake(),
@@ -862,15 +845,15 @@ final class ChainTest extends TestCase
         foreach ($this->case as $item) {
             $arr = [
                 'a' => [
-                    'a.a' => $item
-                ]
+                    'a.a' => $item,
+                ],
             ];
 
             $this->assertEqualsMultiple(
                 [
                     'a' => [
-                        'a.a' => $this->case['kebab']
-                    ]
+                        'a.a' => $this->case['kebab'],
+                    ],
                 ],
                 Chain::from($arr)->elems->elems->keys->case->toKebab()->toArray(),
                 ChainFunc::from($arr)->elems->elems->keys->case->toKebab(),
@@ -880,15 +863,15 @@ final class ChainTest extends TestCase
         foreach ($this->case as $item) {
             $arr = [
                 'a' => [
-                    'a.a' => $item
-                ]
+                    'a.a' => $item,
+                ],
             ];
 
             $this->assertEqualsMultiple(
                 [
                     'a' => [
-                        'a.a' => $this->case['screamSnake']
-                    ]
+                        'a.a' => $this->case['screamSnake'],
+                    ],
                 ],
                 Chain::from($arr)->elems->elems->keys->case->toScreamSnake()->toArray(),
                 ChainFunc::from($arr)->elems->elems->keys->case->toSCreamSnake(),
@@ -898,15 +881,15 @@ final class ChainTest extends TestCase
         foreach ($this->case as $item) {
             $arr = [
                 'a' => [
-                    'a.a' => $item
-                ]
+                    'a.a' => $item,
+                ],
             ];
 
             $this->assertEqualsMultiple(
                 [
                     'a' => [
-                        'a.a' => $this->case['screamKebab']
-                    ]
+                        'a.a' => $this->case['screamKebab'],
+                    ],
                 ],
                 Chain::from($arr)->elems->elems->keys->case->toScreamKebab()->toArray(),
                 ChainFunc::from($arr)->elems->elems->keys->case->toScreamKebab(),
@@ -927,8 +910,8 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => 1
-                ]
+                    'a.a' => 1,
+                ],
             ],
             Chain::from($this->nestedDepthSingled)->elems->elems->find(fn(int $item) => $item == 1),
             ChainFunc::from($this->nestedDepthSingled)->elems->elems->find(fn(int $item) => $item == 1),
@@ -960,8 +943,8 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [1, 2, 3, 4, 5]
-            ]
+                'a.a' => [1, 2, 3, 4, 5],
+            ],
         ];
 
         $this->assertEqualsMultiple(
@@ -969,9 +952,9 @@ final class ChainTest extends TestCase
                 'a' => [
                     'a.a' => [
                         'less' => [1, 2, 3],
-                        'more' => [4, 5]
-                    ]
-                ]
+                        'more' => [4, 5],
+                    ],
+                ],
             ],
             Chain::from($arr)->elems->elems->group(fn(int $item) => $item > 3 ? 'more' : 'less')->toArray(),
             ChainFunc::from($arr)->elems->elems->group(fn(int $item) => $item > 3 ? 'more' : 'less'),
@@ -984,8 +967,8 @@ final class ChainTest extends TestCase
                     ['a' => 1],
                     ['a' => 1],
                     ['b' => 2],
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->assertEqualsMultiple(
@@ -999,8 +982,8 @@ final class ChainTest extends TestCase
                         '' => [
                             0 => ['b' => 2],
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
             Chain::from($arr)->elems->elems->group->byField('a')->toArray(),
             ChainFunc::from($arr)->elems->elems->group->byField('a'),
@@ -1030,8 +1013,8 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [$first, $second, $third, $fourth]
-            ]
+                'a.a' => [$first, $second, $third, $fourth],
+            ],
         ];
 
         $this->assertEqualsMultiple(
@@ -1040,18 +1023,18 @@ final class ChainTest extends TestCase
                     'a.a' => [
                         [
                             'key'   => $first,
-                            'items' => [$first, $third]
+                            'items' => [$first, $third],
                         ],
                         [
                             'key'   => $second,
-                            'items' => [$second]
+                            'items' => [$second],
                         ],
                         [
                             'key'   => $fourth,
-                            'items' => [$fourth]
+                            'items' => [$fourth],
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
             Chain::from($arr)->elems->elems->group->toStruct(fn($item) => $item)->toArray(),
             ChainFunc::from($arr)->elems->elems->group->toStruct(fn($item) => $item),
@@ -1069,8 +1052,8 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => []
-                ]
+                    'a.a' => [],
+                ],
             ],
             Chain::from($this->nestedDepthSingled)->elems->elems->clear()->toArray(),
             ChainFunc::from($this->nestedDepthSingled)->elems->elems->clear(),
@@ -1088,14 +1071,14 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => []
-            ]
+                'a.a' => [],
+            ],
         ];
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => true
-                ]
+                    'a.a' => true,
+                ],
             ],
             Chain::from($arr)->elems->elems->is->empty()->toArray(),
             ChainFunc::from($arr)->elems->elems->is->empty(),
@@ -1112,8 +1095,8 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => false
-                ]
+                    'a.a' => false,
+                ],
             ],
             Chain::from($arr)->elems->elems->is->notEmpty()->toArray(),
             ChainFunc::from($arr)->elems->elems->is->notEmpty(),
@@ -1130,14 +1113,14 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [1, 2, 3]
-            ]
+                'a.a' => [1, 2, 3],
+            ],
         ];
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => true
-                ]
+                    'a.a' => true,
+                ],
             ],
             Chain::from($arr)->elems->elems->is->every(fn(int $item) => $item > 0)->toArray(),
             ChainFunc::from($arr)->elems->elems->is->every(fn(int $item) => $item > 0),
@@ -1154,14 +1137,14 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [1, 2, 3]
-            ]
+                'a.a' => [1, 2, 3],
+            ],
         ];
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => true
-                ]
+                    'a.a' => true,
+                ],
             ],
             Chain::from($arr)->elems->elems->is->none(fn(int $item) => $item > 100)->toArray(),
             ChainFunc::from($arr)->elems->elems->is->none(fn(int $item) => $item > 100),
@@ -1178,14 +1161,14 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [1, 2, 3]
-            ]
+                'a.a' => [1, 2, 3],
+            ],
         ];
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => true
-                ]
+                    'a.a' => true,
+                ],
             ],
             Chain::from($arr)->elems->elems->is->any(fn(int $item) => $item > 2)->toArray(),
             ChainFunc::from($arr)->elems->elems->is->any(fn(int $item) => $item > 2),
@@ -1202,14 +1185,14 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [0 => 1, 1 => 2, 2 => 3]
-            ]
+                'a.a' => [0 => 1, 1 => 2, 2 => 3],
+            ],
         ];
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => true
-                ]
+                    'a.a' => true,
+                ],
             ],
             Chain::from($arr)->elems->elems->is->list()->toArray(),
             ChainFunc::from($arr)->elems->elems->is->list(),
@@ -1226,14 +1209,14 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [1, 2, 3]
-            ]
+                'a.a' => [1, 2, 3],
+            ],
         ];
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => true
-                ]
+                    'a.a' => true,
+                ],
             ],
             Chain::from($arr)->elems->elems->is->hasValue(1, 10)->toArray(),
             ChainFunc::from($arr)->elems->elems->is->hasValue(1, 10),
@@ -1250,14 +1233,14 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => ['a' => 1, 'b' => 2]
-            ]
+                'a.a' => ['a' => 1, 'b' => 2],
+            ],
         ];
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => true
-                ]
+                    'a.a' => true,
+                ],
             ],
             Chain::from($arr)->elems->elems->is->fieldHasValue('a', 1, 10)->toArray(),
             ChainFunc::from($arr)->elems->elems->is->fieldHasValue('a', 1, 10),
@@ -1274,14 +1257,14 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => ['a' => 1, 'b' => 2]
-            ]
+                'a.a' => ['a' => 1, 'b' => 2],
+            ],
         ];
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => true
-                ]
+                    'a.a' => true,
+                ],
             ],
             Chain::from($arr)->elems->elems->is->hasKey('a', 'd')->toArray(),
             ChainFunc::from($arr)->elems->elems->is->hasKey('a', 'd'),
@@ -1315,14 +1298,14 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [1, 2, 3, 4, 5]
-            ]
+                'a.a' => [1, 2, 3, 4, 5],
+            ],
         ];
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [[1, 2], [3, 4], [5]]
-                ]
+                    'a.a' => [[1, 2], [3, 4], [5]],
+                ],
             ],
             Chain::from($arr)->elems->elems->chunk->bySize(2)->toArray(),
             ChainFunc::from($arr)->elems->elems->chunk->bySize(2),
@@ -1330,8 +1313,8 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [[1, 2], [3, 4], [5]]
-                ]
+                    'a.a' => [[1, 2], [3, 4], [5]],
+                ],
             ],
             Chain::from($arr)->elems->elems->chunk->byCount(3)->toArray(),
             ChainFunc::from($arr)->elems->elems->chunk->byCount(3),
@@ -1349,16 +1332,16 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => ['a' => 10, 'b' => 20, 'c' => 30]
-            ]
+                'a.a' => ['a' => 10, 'b' => 20, 'c' => 30],
+            ],
         ];
 
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => ['10' => 'a', '20' => 'b', '30' => 'c']
-                ]
+                    'a.a' => ['10' => 'a', '20' => 'b', '30' => 'c'],
+                ],
             ],
             Chain::from($arr)->elems->elems->flip()->toArray(),
             ChainFunc::from($arr)->elems->elems->flip(),
@@ -1389,7 +1372,7 @@ final class ChainTest extends TestCase
             'a' => [
                 'a.a' => [1, 2, 3],
                 'a.b' => [4, 5, 6],
-            ]
+            ],
         ];
 
 
@@ -1407,7 +1390,7 @@ final class ChainTest extends TestCase
                 'a' => [
                     'a.a' => [2, 3],
                     'a.b' => [5, 6],
-                ]
+                ],
             ],
             $ch->toArray(),
         );
@@ -1438,7 +1421,7 @@ final class ChainTest extends TestCase
             'a' => [
                 'a.a' => [1, 2, 3],
                 'a.b' => [4, 5, 6],
-            ]
+            ],
         ];
 
 
@@ -1456,7 +1439,7 @@ final class ChainTest extends TestCase
                 'a' => [
                     'a.a' => [1, 2],
                     'a.b' => [4, 5],
-                ]
+                ],
             ],
             $ch->toArray(),
         );
@@ -1487,7 +1470,7 @@ final class ChainTest extends TestCase
             'a' => [
                 'a.a' => [1, 2, 3, 4],
                 'a.b' => [5, 6, 7, 8],
-            ]
+            ],
         ];
         $ch = Chain::from($arr);
         $cf = ChainFunc::from($arr);
@@ -1495,7 +1478,7 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 [3],
-                [7]
+                [7],
             ],
             $ch->elems->elems->splice(2, 1, 'item'),
             $cf->elems->elems->splice(2, 1, 'item'),
@@ -1506,7 +1489,7 @@ final class ChainTest extends TestCase
                 'a' => [
                     'a.a' => [1, 2, 'item', 4],
                     'a.b' => [5, 6, 'item', 8],
-                ]
+                ],
             ],
             $ch->toArray(),
             $cf->toArray(),
@@ -1538,7 +1521,7 @@ final class ChainTest extends TestCase
             'a' => [
                 'a.a' => [1, 2, 3, 4],
                 'a.b' => [5, 6, 7, 8],
-            ]
+            ],
         ];
         $ch = Chain::from($arr);
         $cf = ChainFunc::from($arr);
@@ -1546,7 +1529,7 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 [1, 2],
-                [5, 6]
+                [5, 6],
             ],
             $ch->elems->elems->splice->head(2, 'item'),
             $cf->elems->elems->splice->head(2, 'item'),
@@ -1557,7 +1540,7 @@ final class ChainTest extends TestCase
                 'a' => [
                     'a.a' => ['item', 3, 4],
                     'a.b' => ['item', 7, 8],
-                ]
+                ],
             ],
             $ch->toArray(),
             $cf->toArray(),
@@ -1589,7 +1572,7 @@ final class ChainTest extends TestCase
             'a' => [
                 'a.a' => [1, 2, 3, 4],
                 'a.b' => [5, 6, 7, 8],
-            ]
+            ],
         ];
         $ch = Chain::from($arr);
         $cf = ChainFunc::from($arr);
@@ -1597,7 +1580,7 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 [3, 4],
-                [7, 8]
+                [7, 8],
             ],
             $ch->elems->elems->splice->tail(2, 'item'),
             $cf->elems->elems->splice->tail(2, 'item'),
@@ -1608,7 +1591,7 @@ final class ChainTest extends TestCase
                 'a' => [
                     'a.a' => [1, 2, 'item'],
                     'a.b' => [5, 6, 'item'],
-                ]
+                ],
             ],
             $ch->toArray(),
             $cf->toArray(),
@@ -1638,15 +1621,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [10 => 1, 2, 3]
-            ]
+                'a.a' => [10 => 1, 2, 3],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [2, 3]
-                ]
+                    'a.a' => [2, 3],
+                ],
             ],
             Chain::from($arr)->elems->elems->slice(1, 2)->toArray(),
             ChainFunc::from($arr)->elems->elems->slice(1, 2),
@@ -1654,8 +1637,8 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1, 2]
-                ]
+                    'a.a' => [1, 2],
+                ],
             ],
             Chain::from($arr)->elems->elems->slice->head(2)->toArray(),
             ChainFunc::from($arr)->elems->elems->slice->head(2),
@@ -1663,8 +1646,8 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [2, 3]
-                ]
+                    'a.a' => [2, 3],
+                ],
             ],
             Chain::from($arr)->elems->elems->slice->tail(2)->toArray(),
             ChainFunc::from($arr)->elems->elems->slice->tail(2),
@@ -1683,15 +1666,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [1, 2, 3, 4, 5]
-            ]
+                'a.a' => [1, 2, 3, 4, 5],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [6, 7, 3, 4, 8]
-                ]
+                    'a.a' => [6, 7, 3, 4, 8],
+                ],
             ],
             Chain::from($arr)->elems->elems->replace([6, 7], [4 => 8])->toArray(),
             ChainFunc::from($arr)->elems->elems->replace([6, 7], [4 => 8]),
@@ -1705,13 +1688,13 @@ final class ChainTest extends TestCase
         $arrReplace1 = [
             1 => [
                 1 => 7,
-                2 => 8
-            ]
+                2 => 8,
+            ],
         ];
         $arrReplace2 = [
             1 => [
-                2 => 9
-            ]
+                2 => 9,
+            ],
         ];
         $this->assertEqualsMultiple(
             Func::replaceRecursive($arr, $arrReplace1, $arrReplace2),
@@ -1725,8 +1708,8 @@ final class ChainTest extends TestCase
                 'a.a' => [
                     [1, 2, 3],
                     [4, 5, 6],
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->assertEqualsMultiple(
@@ -1735,8 +1718,8 @@ final class ChainTest extends TestCase
                     'a.a' => [
                         [1, 2, 3],
                         [4, 7, 9],
-                    ]
-                ]
+                    ],
+                ],
             ],
             Chain::from($arr)->elems->elems->replace->recursive($arrReplace1, $arrReplace2)->toArray(),
             ChainFunc::from($arr)->elems->elems->replace->recursive($arrReplace1, $arrReplace2),
@@ -1771,14 +1754,14 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [1, [2], [3, [4, [5]]]]
-            ]
+                'a.a' => [1, [2], [3, [4, [5]]]],
+            ],
         ];
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1, 2, 3, 4, [5]]
-                ]
+                    'a.a' => [1, 2, 3, 4, [5]],
+                ],
             ],
             Chain::from($arr)->elems->elems->flatten(2)->toArray(),
             ChainFunc::from($arr)->elems->elems->flatten(2),
@@ -1786,8 +1769,8 @@ final class ChainTest extends TestCase
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1, 2, 3, 4, 5]
-                ]
+                    'a.a' => [1, 2, 3, 4, 5],
+                ],
             ],
             Chain::from($arr)->elems->elems->flatten->all()->toArray(),
             ChainFunc::from($arr)->elems->elems->flatten->all(),
@@ -1812,15 +1795,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [1, 2]
-            ]
+                'a.a' => [1, 2],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => [1, 2, 0, 0, 0]
-                ]
+                    'a.a' => [1, 2, 0, 0, 0],
+                ],
             ],
             Chain::from($arr)->elems->elems->pad(5, 0)->toArray(),
             ChainFunc::from($arr)->elems->elems->pad(5, 0),
@@ -1844,15 +1827,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [1, 2, 3]
-            ]
+                'a.a' => [1, 2, 3],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => 2
-                ]
+                    'a.a' => 2,
+                ],
             ],
             Chain::from($arr)->elems->elems->get(1)->toArray(),
             ChainFunc::from($arr)->elems->elems->get(1),
@@ -1875,15 +1858,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => [1, 2, 3]
-            ]
+                'a.a' => [1, 2, 3],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => 2
-                ]
+                    'a.a' => 2,
+                ],
             ],
             Chain::from($arr)->elems->elems->get->orElse(1, 'else')->toArray(),
             ChainFunc::from($arr)->elems->elems->get->orElse(1, 'else'),
@@ -1914,15 +1897,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3]
-            ]
+                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => 2
-                ]
+                    'a.a' => 2,
+                ],
             ],
             Chain::from($arr)->elems->elems->get->byNumber(1)->toArray(),
             ChainFunc::from($arr)->elems->elems->get->byNumber(1),
@@ -1945,15 +1928,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3]
-            ]
+                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => 2
-                ]
+                    'a.a' => 2,
+                ],
             ],
             Chain::from($arr)->elems->elems->get->byNumberOrElse(1, 'else')->toArray(),
             ChainFunc::from($arr)->elems->elems->get->byNumberOrElse(1, 'else'),
@@ -1970,15 +1953,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3]
-            ]
+                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => 2
-                ]
+                    'a.a' => 2,
+                ],
             ],
             Chain::from($arr)->elems->elems->get->byNumberOrException(1)->toArray(),
             ChainFunc::from($arr)->elems->elems->get->byNumberOrException(1),
@@ -1996,15 +1979,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3]
-            ]
+                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => 1
-                ]
+                    'a.a' => 1,
+                ],
             ],
             Chain::from($arr)->elems->elems->get->first()->toArray(),
             ChainFunc::from($arr)->elems->elems->get->first(),
@@ -2027,15 +2010,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3]
-            ]
+                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => 1
-                ]
+                    'a.a' => 1,
+                ],
             ],
             Chain::from($arr)->elems->elems->get->firstOrElse('else')->toArray(),
             ChainFunc::from($arr)->elems->elems->get->firstOrElse('else'),
@@ -2053,15 +2036,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3]
-            ]
+                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => 1
-                ]
+                    'a.a' => 1,
+                ],
             ],
             Chain::from($arr)->elems->elems->get->firstOrException()->toArray(),
             ChainFunc::from($arr)->elems->elems->get->firstOrException(),
@@ -2079,15 +2062,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3]
-            ]
+                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => 3
-                ]
+                    'a.a' => 3,
+                ],
             ],
             Chain::from($arr)->elems->elems->get->last()->toArray(),
             ChainFunc::from($arr)->elems->elems->get->last(),
@@ -2110,15 +2093,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3]
-            ]
+                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => 3
-                ]
+                    'a.a' => 3,
+                ],
             ],
             Chain::from($arr)->elems->elems->get->lastOrElse('else')->toArray(),
             ChainFunc::from($arr)->elems->elems->get->lastOrElse('else'),
@@ -2136,15 +2119,15 @@ final class ChainTest extends TestCase
 
         $arr = [
             'a' => [
-                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3]
-            ]
+                'a.a' => ['a' => 1, 'b' => 2, 'c' => 3],
+            ],
         ];
 
         $this->assertEqualsMultiple(
             [
                 'a' => [
-                    'a.a' => 3
-                ]
+                    'a.a' => 3,
+                ],
             ],
             Chain::from($arr)->elems->elems->get->lastOrException()->toArray(),
             ChainFunc::from($arr)->elems->elems->get->lastOrException(),

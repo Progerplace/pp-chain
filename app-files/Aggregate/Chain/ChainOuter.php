@@ -35,7 +35,9 @@ class ChainOuter
     }
 
     /**
-     * Проверить логическое условие ко всему массиву
+     * Проверить логическое условие ко всему массиву.
+     *
+     * Параметр `callback` - функции - `$array`
      *
      * @param callable $callback
      * @return bool
@@ -46,7 +48,9 @@ class ChainOuter
     }
 
     /**
-     * Изменить массив целиком
+     * Изменить массив целиком.
+     *
+     * Параметр `callback` - функции - `$array`
      *
      * @param callable $callback
      * @return Chain
@@ -59,7 +63,9 @@ class ChainOuter
     }
 
     /**
-     * Проверить массив целиком (например, для точки остановки в дебагере)
+     * Выполнить действие с массивом целиком без его изменения (например, для точки остановки в дебагере).
+     *
+     * Параметр `callback` - функции - `$array`
      *
      * @param callable $callback
      * @return Chain
@@ -72,11 +78,11 @@ class ChainOuter
     }
 
     /**
-     * Вывести массив через print_r
+     * Вывести массив через `print_r` (с тегами `pre`)
      *
      * @return Chain
      */
-    public function print( ): Chain
+    public function print(): Chain
     {
         echo '<pre>';
         print_r($this->array);

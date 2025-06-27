@@ -18,9 +18,17 @@ class ChainKeysCase
     }
 
     /**
-     * Подробности {@see Func::keysCaseToCamel()}
+     * Преобразовать стиль ключей к "camelCase".
+     *
+     * ```
+     * Ch::from(['var_first' => 1, 'var_second' => 2])->keys->case->toCamel()->toArray();
+     * // ['varFirst' => 1, 'varSecond' => 2]
+     * ```
      *
      * @return Chain
+     *
+     * @see ChainFuncKeysCase::toCamel()
+     * @see Func::keysCaseToCamel()
      */
     public function toCamel(): Chain
     {
@@ -31,9 +39,17 @@ class ChainKeysCase
     }
 
     /**
-     * Подробности {@see Func::keysCaseToPaskal()}
+     * Преобразовать стиль ключей к "PaskalCase".
+     *
+     * ```
+     * Ch::from(['var_first' => 1, 'var_second' => 2])->keys->case->toPaskal()->toArray()
+     * // ['VarFirst' => 1, 'VarSecond' => 2]
+     * ```
      *
      * @return Chain
+     *
+     * @see ChainFuncKeysCase::toPaskal()
+     * @see Func::keysCaseToPaskal()
      */
     public function toPaskal(): Chain
     {
@@ -44,9 +60,17 @@ class ChainKeysCase
     }
 
     /**
-     * Подробности {@see Func::keysCaseToSnake()}
+     * Преобразовать стиль ключей к "snake_case".
+     *
+     * ```
+     * Ch::from(['varFirst' => 1, 'varSecond' => 2])->keys->case->toSnake()->toArray();
+     * // ['var_first' => 1, 'var_second' => 2]
+     * ```
      *
      * @return Chain
+     *
+     * @see ChainFuncKeysCase::toSnake()
+     * @see Func::keysCaseToSnake()
      */
     public function toSnake(): Chain
     {
@@ -57,9 +81,17 @@ class ChainKeysCase
     }
 
     /**
-     * Подробности {@see Func::keysCaseToKebab()}
+     * Преобразовать стиль ключей к "kebab-case".
+     *
+     * ```
+     * Ch::from(['varFirst' => 1, 'varSecond' => 2])->keys->case->toKebab()->toArray();
+     * // ['var-first' => 1, 'var-second' => 2]
+     * ```
      *
      * @return Chain
+     *
+     * @see ChainFuncKeysCase::toKebab()
+     * @see Func::keysCaseToKebab()
      */
     public function toKebab(): Chain
     {
@@ -70,9 +102,17 @@ class ChainKeysCase
     }
 
     /**
-     * Подробности {@see Func::keysCaseToScreamSnake()}
+     * Преобразовать стиль ключей к "SCREAM_SNAKE_CASE".
+     *
+     * ```
+     * Ch::from(['varFirst' => 1, 'varSecond' => 2])->keys->case->toScreamSnake()->toArray();
+     * // ['VAR_FIRST' => 1, 'VAR_SECOND' => 2]
+     * ```
      *
      * @return Chain
+     *
+     * @see ChainFuncKeysCase::toScreamSnake()
+     * @see Func::keysCaseToScreamSnake()
      */
     public function toScreamSnake(): Chain
     {
@@ -83,9 +123,17 @@ class ChainKeysCase
     }
 
     /**
-     * Подробности {@see Func::keysCaseToScreamKebab()}
+     * Преобразовать стиль ключей к "SCREAM-KEBAB-CASE".
+     *
+     * ```
+     * Ch::from(['varFirst' => 1, 'varSecond' => 2])->keys->case->toScreamKebab()->toArray();
+     * // ['VAR-FIRST' => 1, 'VAR-SECOND' => 2]
+     * ```
      *
      * @return Chain
+     *
+     * @see ChainFuncKeysCase::toScreamKebab()
+     * @see Func::keysCaseToScreamKebab()
      */
     public function toScreamKebab(): Chain
     {

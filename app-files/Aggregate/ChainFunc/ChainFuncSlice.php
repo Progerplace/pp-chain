@@ -19,11 +19,23 @@ class ChainFuncSlice
     }
 
     /**
-     * Подробности {@see Func::sliceHead()}
+     * Выбирает срез массива - `length` элементов с начала массива.
+     *
+     * ```
+     * $arr = [10 => 1, 2, 3, 4, 5];
+     * Cf::from($arr)->slice->head(2);
+     * // [1, 2]
+     *
+     * Cf::from($arr)->slice->head(2, true);
+     * // [10 => 1, 11 => 2]
+     * ```
      *
      * @param int $length
      * @param bool $isPreserveKeys
      * @return array
+     *
+     * @see ChainSlice::head()
+     * @see Func::sliceHead()
      */
     public function head(int $length, bool $isPreserveKeys = false): array
     {
@@ -31,11 +43,23 @@ class ChainFuncSlice
     }
 
     /**
-     * Подробности {@see Func::sliceTail()}
+     * Выбирает срез массива - `length` элементов с конца массива.
+     *
+     * ```
+     * $arr = [10 => 1, 2, 3, 4, 5];
+     * Cf::from($arr)->slice->tail(2);
+     * // [4, 5]
+     *
+     * Cf::from($arr)->slice->tail(2, true);
+     * // [13 => 4, 14 => 5]
+     * ```
      *
      * @param int $length
      * @param bool $isPreserveKeys
      * @return array
+     *
+     * @see ChainSlice::tail()
+     * @see Func::sliceTail()
      */
     public function tail(int $length, bool $isPreserveKeys = false): array
     {

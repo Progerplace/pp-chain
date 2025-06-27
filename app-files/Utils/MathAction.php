@@ -52,7 +52,8 @@ class MathAction
                 return min($values);
             case 'max':
                 return max($values);
-
+            default:
+                return null;
         }
     }
 }

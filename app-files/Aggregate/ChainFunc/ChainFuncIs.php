@@ -19,9 +19,31 @@ class ChainFuncIs
     }
 
     /**
-     * Подробности {@see Func::isEmpty()}
+     * Проверка на пустой массив.
+     *
+     * ```
+     * Cf::from([])->isEmpty()
+     * // true
+     * ```
+     * Дочерние элементы:
+     * ```
+     * $arr = [
+     *   'a' => [
+     *     'a.a' => []
+     *   ]
+     * ];
+     * Cf::from($arr)->elems->elems->is->empty();
+     * // [
+     * //   'a' => [
+     * //     'a.a' => true
+     * //   ]
+     * // ]
+     * ```
      *
      * @return bool|array
+     *
+     * @see ChainIs::empty()
+     * @see Func::isEmpty()
      */
     public function empty()
     {
@@ -33,9 +55,31 @@ class ChainFuncIs
     }
 
     /**
-     * Подробности {@see Func::isNotEmpty()}
+     * Проверка на непустой массив.
+     *
+     * ```
+     * Cf::from([])->isNotEmpty()
+     * // true
+     * ```
+     * Дочерние элементы:
+     * ```
+     * $arr = [
+     *   'a' => [
+     *     'a.a' => []
+     *   ]
+     * ];
+     * Cf::from($arr)->elems->elems->is->notEmpty();
+     * // [
+     * //   'a' => [
+     * //     'a.a' => true
+     * //   ]
+     * // ]
+     * ```
      *
      * @return bool|array
+     *
+     * @see ChainIs::notEmpty()
+     * @see Func::isNotEmpty()
      */
     public function notEmpty()
     {
@@ -47,9 +91,36 @@ class ChainFuncIs
     }
 
     /**
-     * Подробности {@see Func::isEvery()}
+     * Проверка "все элементы удовлетворяют условию". Вернёт true, если для каждого элемента функция callback вернёт true.
+     *
+     * ```
+     * $arr = [1, 2, 3];
+     *
+     * Cf::from($arr)->is->every(fn(int $item) => $item > 0);
+     * // true
+     *
+     * Cf::from($arr)->is->every(fn(int $item) => $item > 1);
+     * // false
+     * ```
+     * Дочерние элементы:
+     * ```
+     * $arr = [
+     *   'a' => [
+     *     'a.a' => [1, 2, 3]
+     *   ]
+     * ];
+     * Cf::from($arr)->elems->elems->is->every(fn(int $item) => $item > 0);
+     * // [
+     * //   'a' => [
+     * //     'a.a' => true
+     * //   ]
+     * // ]
+     * ```
      *
      * @return bool|array
+     *
+     * @see ChainIs::every()
+     * @see Func::isEvery()
      */
     public function every(callable $callback)
     {
@@ -61,9 +132,34 @@ class ChainFuncIs
     }
 
     /**
-     * Подробности {@see Func::isNone()}
+     * Проверка "все элементы не удовлетворяют условию". Вернёт `true`, если для каждого элемента функция `callback` вернёт `false`.
+     *
+     * ```
+     * Cf::from([1, 2, 3])->is->none(fn(int $item) => $item < 0);
+     * // true
+     *
+     * Cf::from([1, 2, 3])->is->none(fn(int $item) => $item > 0);
+     * // false
+     * ```
+     * Дочерние элементы:
+     * ```
+     * $arr = [
+     *   'a' => [
+     *     'a.a' => [1, 2, 3]
+     *   ]
+     * ];
+     * Cf::from($arr)->elems->elems->is->none(fn(int $item) => $item < 0);
+     * // [
+     * //   'a' => [
+     * //     'a.a' => true
+     * //   ]
+     * // ]
+     * ```
      *
      * @return bool|array
+     *
+     * @see ChainIs::none()
+     * @see Func::isNone()
      */
     public function none(callable $callback)
     {
@@ -75,9 +171,34 @@ class ChainFuncIs
     }
 
     /**
-     * Подробности {@see Func::isAny()}
+     * Проверка "хотя бы один элемент удовлетворяют условию". Вернёт `true`, если хотя бы для одного элемента функция `callback` вернёт `true`.
+     *
+     * ```
+     * Cf::from([1, 2, 3])->is->any(fn(int $item) => $item >= 3);
+     * // true
+     *
+     * Cf::from([1, 2, 3])->is->any(fn(int $item) => $item > 10);
+     * // false
+     * ```
+     * Дочерние элементы:
+     * ```
+     * $arr = [
+     *   'a' => [
+     *     'a.a' => [1, 2, 3]
+     *   ]
+     * ];
+     * Cf::from($arr)->elems->elems->is->any(fn(int $item) => $item > 1);
+     * // [
+     * //   'a' => [
+     * //     'a.a' => true
+     * //   ]
+     * // ]
+     * ```
      *
      * @return bool|array
+     *
+     * @see ChainIs::any()
+     * @see Func::isAny()
      */
     public function any(callable $callback)
     {
@@ -89,9 +210,34 @@ class ChainFuncIs
     }
 
     /**
-     * Подробности {@see Func::isList()}
+     * Проверяет, является ли массив списком.
+     *
+     * ```
+     * Cf::from([0 => 1, 1 => 2, 2 => 3])->is->list();
+     * // true
+     *
+     * Cf::from([10 => 1, 11 => 2, 12 => 3])->is->list();
+     * // false
+     * ```
+     * Дочерние элементы:
+     * ```
+     * $arr = [
+     *   'a' => [
+     *     'a.a' => [0 => 1, 1 => 2, 2 => 3]
+     *   ]
+     * ];
+     * Cf::from($arr)->elems->elems->is->list();
+     * // [
+     * //   'a' => [
+     * //     'a.a' => true
+     * //   ]
+     * // ]
+     * ```
      *
      * @return bool|array
+     *
+     * @see ChainIs::list()
+     * @see Func::isList()
      */
     public function list()
     {
@@ -103,10 +249,18 @@ class ChainFuncIs
     }
 
     /**
-     * Подробности {@see Func::isHasValue()}
+     * Проверки, есть ли хотя бы одно из переданных значений в массиве. Используется строгое сравнение `===`.
+     *
+     * ```
+     * Cf::from([1, 2, 3])->is->hasValue(3, 4);
+     * // true
+     * ```
      *
      * @param mixed ...$values
      * @return bool|array
+     *
+     * @see ChainIs::hasValue()
+     * @see Func::isHasValue()
      */
     public function hasValue(...$values)
     {
@@ -118,11 +272,19 @@ class ChainFuncIs
     }
 
     /**
-     * Подробности {@see Func::isFieldHasValue()}
+     * Проверка, что значение поля `field` равно хотя бы одному из переданных значений `values`. Используется строгое сравнение `===`.
+     *
+     * ```
+     * Cf::from(['a' => 1, 'b' => 2])->is->fieldHasValue('a', 1, 10);
+     * // true
+     * ```
      *
      * @param string|int $field
      * @param mixed ...$values
      * @return bool|array
+     *
+     * @see ChainIs::fieldHasValue()
+     * @see Func::isFieldHasValue()
      */
     public function fieldHasValue($field, ...$values)
     {
@@ -134,10 +296,18 @@ class ChainFuncIs
     }
 
     /**
-     * Подробности {@see Func::isHasKey()}
+     * Проверка, присутствует ли в массиве хотя бы один ключ из `keys`.
+     *
+     * ```
+     * Cf::from(['a' => 1, 'b' => 2])->is->hasKey('a', 'd');
+     * // true
+     * ```
      *
      * @param mixed ...$keys
      * @return bool|array
+     *
+     * @see ChainIs::hasKey()
+     * @see Func::isHasKey()
      */
     public function hasKey(...$keys)
     {

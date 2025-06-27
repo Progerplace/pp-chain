@@ -3,31 +3,40 @@
 namespace Ru\Progerplace\Chain;
 
 use Error;
+use Ru\Progerplace\Chain\Aggregate\Chain\ChainAppend;
+use Ru\Progerplace\Chain\Aggregate\Chain\ChainJson;
+use Ru\Progerplace\Chain\Aggregate\Chain\ChainKeys;
+use Ru\Progerplace\Chain\Aggregate\Chain\ChainKeysCase;
+use Ru\Progerplace\Chain\Aggregate\Chain\ChainPrepend;
+use Ru\Progerplace\Chain\Aggregate\Chain\ChainReject;
+use Ru\Progerplace\Chain\Aggregate\Chain\ChainUnique;
+use Ru\Progerplace\Chain\Aggregate\ChainFunc\ChainFuncReject;
 use Ru\Progerplace\Chain\Exception\NotFoundException;
 use Ru\Progerplace\Chain\Utils\CaseKey;
 use Ru\Progerplace\Chain\Utils\MathAction;
-use Throwable;
 
 class Func
 {
     /**
      * Изменить элементы коллекции. Ключи сохраняются.
      *
-     * Параметры callback - `$element`, `$key`
+     * Параметры $callback - `$element`, `$key`
      *
      * ```
-     * Func::map(['a' => 1, 'b' => 2], fn(int $item, string $key) => $key . $item)
+     * F::map(['a' => 1, 'b' => 2], fn(int $item, string $key) => $key . $item);
      * // ['a' => 'a1', 'b' => 'b2']
      *
-     * ChainFunc::from([1,2,3]))->map(fn(int $item) => $item + 5);
-     * Chain::from([1,2,3]))->map(fn(int $item) => $item + 5)->toArray();
-     * Func::map([1,2,3], fn(int $item) => $item + 5);
-     * // [6,7,8]
+     * F::map([1, 2, 3], fn(int $item) => $item + 5);
+     * // [6, 7, 8]
      * ```
      *
      * @param array $arr
      * @param callable $callback
      * @return array
+     *
+     * @link https://www.php.net/manual/ru/function.array-map.php Php.net - array_map
+     * @see Cf::map()
+     * @see Ch::map()
      */
     public static function map(array $arr, callable $callback): array
     {
@@ -40,23 +49,26 @@ class Func
     }
 
     /**
-     * Убрать элементы из коллекции, для которых функция $callback вернула true. Ключи сохраняются.
+     * Убрать элементы из коллекции, для которых функция $callback вернула `true`. Ключи сохраняются.
      *
-     * Параметры callback функции - `$element`, `$key`
+     * Параметры callback функции - `$element`, `$key`.
      *
      * ```
-     * Func::reject(['a' => null, 'b' => 'foo', 'c' => ''], fn(?string $item, string $key) => $key === 'a' || $item === 'foo')
-     * // ['c' => '']
-     *
-     * ChainFunc::from([1,2,3,4,5])->reject(fn(int $item) => $item < 4)
-     * Chain::from([1,2,3,4,5])->reject(fn(int $item) => $item < 4)->toArray()
-     * Func::reject([1,2,3,4,5], fn(int $item) => $item < 4)
+     * Cf::from([1, 2, 3, 4, 5])->reject(fn(int $item) => $item < 4);
+     * Ch::from([1, 2, 3, 4, 5])->reject(fn(int $item) => $item < 4)->toArray();
+     * Func::reject([1, 2, 3, 4, 5], fn(int $item) => $item < 4);
      * // [3 => 4, 4 => 5]
+     *
+     * Func::reject(['a' => null, 'b' => 'foo', 'c' => ''], fn(?string $item, string $key) => $key === 'a' || $item === 'foo');
+     * // ['c' => '']
      * ```
      *
      * @param array $arr
      * @param callable $callback
      * @return array
+     *
+     * @see Chain::reject()
+     * @see ChainFunc::reject()
      */
     public static function reject(array $arr, callable $callback): array
     {
@@ -75,17 +87,20 @@ class Func
      * Убрать null элементы из коллекции. Проверка осуществляется методом `is_null`. Ключи сохраняются.
      *
      * ```
-     * Func::rejectNull(['a' => null, 'b' => 'foo', 'c' => ''])
-     * // ['b' => 'foo', 'c' => '']
-     *
-     * ChainFunc::from([null, 'foo', ''])->reject->null()
-     * Chain::from([null, 'foo', ''])->reject->null()->toArray()
-     * Func::rejectNull([null, 'foo', ''])
+     * Cf::from([null, 'foo', ''])->reject->null();
+     * Ch::from([null, 'foo', ''])->reject->null()->toArray();
+     * Func::rejectNull([null, 'foo', '']);
      * // [1 => 'foo', 2 => '']
+     *
+     * Func::rejectNull(['a' => null, 'b' => 'foo', 'c' => '']);
+     * // ['b' => 'foo', 'c' => '']
      * ```
      *
      * @param array $arr
      * @return array
+     *
+     * @see ChainReject::null()
+     * @see ChainFuncReject::null()
      */
     public static function rejectNull(array $arr): array
     {
@@ -96,17 +111,20 @@ class Func
      * Убрать пустые элементы из коллекции. Проверка осуществляется методом `empty`. Ключи сохраняются.
      *
      * ```
-     * Func::rejectEmpty(['a' => null, 'b' => 'foo', 'c' => ''])
-     * // ['b' => 'foo']
-     *
-     * ChainFunc::from([null, 'foo', ''])->reject->empty()
-     * Chain::from([null, 'foo', ''])->reject->empty()->toArray()
-     * Func::rejectEmpty([null, 'foo', ''])
+     * Cf::from([null, 'foo', ''])->reject->empty();
+     * Ch::from([null, 'foo', ''])->reject->empty()->toArray();
+     * Func::rejectEmpty([null, 'foo', '']);
      * // [1 => 'foo']
+     *
+     * Func::rejectEmpty(['a' => null, 'b' => 'foo', 'c' => '']);
+     * // ['b' => 'foo']
      * ```
      *
      * @param array $arr
      * @return array
+     *
+     * @see ChainReject::empty()
+     * @see ChainFuncReject::empty()
      */
     public static function rejectEmpty(array $arr): array
     {
@@ -114,30 +132,29 @@ class Func
     }
 
     /**
-     * Убрать элементы из коллекции с указанными ключами. Используется нестрогое сравнение `==`.
+     * Убрать элементы из коллекции с указанными ключами. Используется строгое сравнение `===`.
      *
      * ```
-     * ChainFunc::from(['a' => 1, 'b' => 2, 'c' => 3])->reject->keys('b', 'c')
-     * Chain::from(['a' => 1, 'b' => 2, 'c' => 3])->reject->keys('b', 'c')->toArray()
-     * Func::rejectKeys(['a' => 1, 'b' => 2, 'c' => 3], 'b', 'c')
+     * Func::rejectKeys(['a' => 1, 'b' => 2, 'c' => 3], 'b', 'c');
      * // ['a' => 1]
      * ```
      *
      * @param array $arr
      * @param string|int ...$keys
      * @return array
+     *
+     * @see ChainReject::keys()
+     * @see ChainFuncReject::keys()
      */
     public static function rejectKeys(array $arr, ...$keys): array
     {
-        return array_filter($arr, fn($key) => !in_array($key, $keys), ARRAY_FILTER_USE_KEY);
+        return array_filter($arr, fn($key) => !in_array($key, $keys, true), ARRAY_FILTER_USE_KEY);
     }
 
     /**
-     * Убрать элементы из коллекции с указанными значениями. Используется нестрогое сравнение `==`. Ключи сохраняются.
+     * Убрать элементы из коллекции с указанными значениями. Используется строгое сравнение `===`. Ключи сохраняются.
      *
      * ```
-     * ChainFunc::from(['a' => 1, 'b' => 2, 'c' => 3])->reject->values(1, '2')
-     * Chain::from(['a' => 1, 'b' => 2, 'c' => 3])->reject->values(1, '2')->toArray()
      * Func::rejectValues(['a' => 1, 'b' => 2, 'c' => 3], 1, '2')
      * // ['c' => 3]
      * ```
@@ -145,24 +162,29 @@ class Func
      * @param array $arr
      * @param mixed ...$values
      * @return array
+     *
+     * @see ChainReject::values()
+     * @see ChainFuncReject::values()
      */
     public static function rejectValues(array $arr, ...$values): array
     {
-        return array_filter($arr, fn($value) => !in_array($value, $values));
+        return array_filter($arr, fn($value) => !in_array($value, $values, true));
     }
 
     /**
-     * Оставить только значения массива.
+     * Возвращает значения массива.
      *
      * ```
-     * ChainFunc::from(['a' => 1, 'b' => 2, 'c' => 3])->values()
-     * Chain::from(['a' => 1, 'b' => 2, 'c' => 3])->values()->toArray()
      * Func::values(['a' => 1, 'b' => 2, 'c' => 3])
-     * // [1,2,3]
+     * // [1, 2, 3]
      * ```
      *
      * @param array $arr
      * @return array
+     *
+     * @link https://www.php.net/manual/ru/function.array-values.php Php.net - array_values
+     * @see Chain::values()
+     * @see ChainFunc::values()
      */
     public static function values(array $arr): array
     {
@@ -170,45 +192,29 @@ class Func
     }
 
     /**
-     * Получить значения массива. Для вложенных элементов работает аналогично `values`
+     * Элементы коллекции в обратном порядке.
+     *
+     * Если `$preserveNumericKeys` установлено в `true`, то числовые ключи будут сохранены. Нечисловые ключи не подвержены этой опции и всегда сохраняются.
      *
      * ```
-     * Chain::from(['a' => 1, 'b' => 2, 'c' => 3])->values->getList();
-     * ChainFunc::from(['a' => 1, 'b' => 2, 'c' => 3])->values->getList();
-     * Func::valuesGetList(['a' => 1, 'b' => 2, 'c' => 3]);
-     * // [1,2,3]
-     * ```
+     * Func::reverse([1, 2, 3])
+     * // [3, 2, 1]
      *
-     * @param array $arr
-     * @return array
-     */
-    public static function valuesGetList(array $arr): array
-    {
-        return array_values($arr);
-    }
-
-    /**
-     * Элементы массива в обратном порядке.
-     *
-     * Если `$preserveNumericKeys` установлено в true, то числовые ключи будут сохранены. Нечисловые ключи не подвержены этой опции и всегда сохраняются.
-     *
-     * ```
-     * ChainFunc::from([1,2,3])->reverse()
-     * Chain::from([1,2,3])->reverse()->toArray()
-     * Func::reverse([1,2,3])
-     * // [3,2,1]
-     *
-     * Func::reverse([1,2,3], true)
+     * Func::reverse([1, 2, 3], true)
      * [2 => 3, 1 => 2, 0 => 1]
      * ```
      *
      * @param array $arr
-     * @param bool $preserveNumericKeys
+     * @param bool $isPreserveNumericKeys = false
      * @return array
+     *
+     * @link https://www.php.net/manual/ru/function.array-reverse.php Php.net - array_reverse
+     * @see Ch::reverse()
+     * @see Cf::reverse()
      */
-    public static function reverse(array $arr, bool $preserveNumericKeys = false): array
+    public static function reverse(array $arr, bool $isPreserveNumericKeys = false): array
     {
-        return array_reverse($arr, $preserveNumericKeys);
+        return array_reverse($arr, $isPreserveNumericKeys);
     }
 
 
@@ -216,28 +222,15 @@ class Func
      * Проверка на пустой массив.
      *
      * ```
-     * ChainFunc::from([])->isEmpty()
-     * Chain::from([])->isEmpty()
      * Func::isEmpty([])
      * // true
      * ```
-     * Дочерние элементы:
-     * ```
-     * $arr = [
-     *     'a' => [
-     *       'a.a' => []
-     *   ]
-     * ];
-     * Chain::from($arr)->elems->elems->is->empty()->toArray();
-     * ChainFunc::from($arr)->elems->elems->is->empty();
-     * // [
-     * //   'a' => [
-     * //     'a.a' => true
-     * //   ]
-     * // ]
-     * ```
+     *
      * @param array $arr
      * @return bool
+     *
+     * @see ChainIs::empty()
+     * @see ChainFuncIs::empty()
      */
     public static function isEmpty(array $arr): bool
     {
@@ -248,28 +241,15 @@ class Func
      * Проверка на непустой массив.
      *
      * ```
-     * ChainFunc::from([])->isNotEmpty()
-     * Chain::from([])->isNotEmpty()
      * Func::isNotEmpty([])
      * // true
      * ```
-     * Дочерние элементы:
-     * ```
-     * $arr = [
-     *     'a' => [
-     *       'a.a' => []
-     *   ]
-     * ];
-     * Chain::from($arr)->elems->elems->is->notEmpty()->toArray();
-     * ChainFunc::from($arr)->elems->elems->is->notEmpty();
-     * // [
-     * //   'a' => [
-     * //     'a.a' => true
-     * //   ]
-     * // ]
-     * ```
+     *
      * @param array $arr
      * @return bool
+     *
+     * @see ChainIs::notEmpty()
+     * @see ChainFuncIs::notEmpty()
      */
     public static function isNotEmpty(array $arr): bool
     {
@@ -277,37 +257,24 @@ class Func
     }
 
     /**
-     * Проверка "все элементы удовлетворяют условию". Вернёт true, если для каждого элемента функция callback вернёт true.
+     * Проверка "все элементы удовлетворяют условию". Вернёт `true`, если для каждого элемента функция callback вернёт `true`.
      *
      * ```
      * $arr = [1, 2, 3];
      *
-     * Chain::from($arr)->is->every(fn(int $item) => $item > 0);
-     * ChainFunc::from($arr)->is->every(fn(int $item) => $item > 0);
      * Func::isEvery($arr, fn(int $item) => $item > 0);
      * // true
      *
      * Func::isEvery($arr, fn(int $item) => $item > 1);
      * // false
      * ```
-     * Дочерние элементы:
-     * ```
-     * $arr = [
-     *   'a' => [
-     *     'a.a' => [1,2,3]
-     *   ]
-     * ];
-     * Chain::from($arr)->elems->elems->is->every(fn(int $item) => $item > 0)->toArray();
-     * ChainFunc::from($arr)->elems->elems->is->every(fn(int $item) => $item > 0);
-     * // [
-     * //   'a' => [
-     * //     'a.a' => true
-     * //   ]
-     * // ]
-     * ```
+     *
      * @param array $arr
      * @param callable $callback
      * @return bool
+     *
+     * @see ChainIs::every()
+     * @see ChainFuncIs::every()
      */
     public static function isEvery(array $arr, callable $callback): bool
     {
@@ -321,37 +288,22 @@ class Func
     }
 
     /**
-     * Проверка "все элементы не удовлетворяют условию". Вернёт true, если для каждого элемента функция callback вернёт false.
+     * Проверка "все элементы не удовлетворяют условию". Вернёт `true`, если для каждого элемента функция `callback` вернёт `false`.
      *
      * ```
-     * $arr = [1, 2, 3];
-     *
-     * Chain::from($arr)->is->none(fn(int $item) => $item < 0);
-     * ChainFunc::from($arr)->is->none(fn(int $item) => $item < 0);
-     * Func::isNone($arr, fn(int $item) => $item < 0);
+     * Func::isNone([1, 2, 3], fn(int $item) => $item < 0);
      * // true
      *
      * Func::isNone($arr, fn(int $item) => $item > 2);
      * // false
      * ```
-     * Дочерние элементы:
-     * ```
-     * $arr = [
-     *   'a' => [
-     *     'a.a' => [1,2,3]
-     *   ]
-     * ];
-     * Chain::from($arr)->elems->elems->is->none(fn(int $item) => $item < 0)->toArray();
-     * ChainFunc::from($arr)->elems->elems->is->none(fn(int $item) => $item < 0);
-     * // [
-     * //   'a' => [
-     * //     'a.a' => true
-     * //   ]
-     * // ]
-     * ```
+     *
      * @param array $arr
      * @param callable $callback
      * @return bool
+     *
+     * @see ChainIs::none()
+     * @see ChainFuncIs::none()
      */
     public static function isNone(array $arr, callable $callback): bool
     {
@@ -365,37 +317,24 @@ class Func
     }
 
     /**
-     * Проверка "хотя бы один элемент удовлетворяют условию". Вернёт true, если хотя бы для одного элемента функция callback вернёт true.
+     * Проверка "хотя бы один элемент удовлетворяют условию". Вернёт `true`, если хотя бы для одного элемента функция `callback` вернёт `true`.
      *
      * ```
      * $arr = [1, 2, 3];
      *
-     * Chain::from($arr)->is->any(fn(int $item) => $item >= 3);
-     * ChainFunc::from($arr)->is->any(fn(int $item) => $item >= 3);
-     * Func::isAny($arr, fn(int $item) => $item >= 3);
+     * Func::isAny([1, 2, 3], fn(int $item) => $item >= 3);
      * // true
      *
      * Func::isAny($arr, fn(int $item) => $item > 10);
      * // false
      * ```
-     * Дочерние элементы:
-     * ```
-     * $arr = [
-     *   'a' => [
-     *     'a.a' => [1,2,3]
-     *   ]
-     * ];
-     * Chain::from($arr)->elems->elems->is->any(fn(int $item) => $item > 1)->toArray();
-     * ChainFunc::from($arr)->elems->elems->is->any(fn(int $item) => $item > 1);
-     * // [
-     * //   'a' => [
-     * //     'a.a' => true
-     * //   ]
-     * // ]
-     * ```
+     *
      * @param array $arr
      * @param callable $callback
      * @return bool
+     *
+     * @see ChainIs::any()
+     * @see ChainFuncIs::any()
      */
     public static function isAny(array $arr, callable $callback): bool
     {
@@ -412,38 +351,19 @@ class Func
      * Проверяет, является ли массив списком.
      *
      * ```
-     * $arr = [0 => 1, 1 => 2, 2 => 3];
-     *
-     * Chain::from($arr)->is->list();
-     * ChainFunc::from($arr)->is->list();
-     * Func::isList($arr);
+     * Func::isList([0 => 1, 1 => 2, 2 => 3]);
      * // true
      *
-     * $arr = [10 => 1, 11 => 2, 12 => 3]
-     *
-     * Chain::from($arr)->is->list();
-     * ChainFunc::from($arr)->is->list();
-     * Func::isList($arr);
+     * Func::isList([10 => 1, 11 => 2, 12 => 3]);
      * // false
      * ```
-     * Дочерние элементы:
-     * ```
-     * $arr = [
-     *   'a' => [
-     *     'a.a' => [0 => 1, 1 => 2, 2 => 3]
-     *   ]
-     * ];
-     * Chain::from($arr)->elems->elems->is->list()->toArray();
-     * ChainFunc::from($arr)->elems->elems->is->list();
-     * // [
-     * //   'a' => [
-     * //     'a.a' => true
-     * //   ]
-     * // ]
-     * ```
+     *
      * @param array $arr
      * @return bool
-     * @link https://www.php.net/manual/ru/function.array-is-list.php php.net - array_is_list
+     *
+     * @link https://www.php.net/manual/ru/function.array-is-list.php Php.net - array_is_list
+     * @see ChainIs::list()
+     * @see ChainFuncIs::list()
      */
     public static function isList(array $arr): bool
     {
@@ -451,24 +371,24 @@ class Func
     }
 
     /**
-     * Проверки, есть ли хотя бы одно из переданных значений в массиве. Используется нестрогое сравнение `==`.
+     * Проверки, есть ли хотя бы одно из переданных значений в массиве. Используется строгое сравнение `===`.
      *
      * ```
-     * $arr = [1, 2, 3];
-     *
-     * Chain::from($arr)->is->hasValue(3, 4);
-     * ChainFunc::from($arr)->is->hasValue(3, 4);
-     * Func::isHasValue($arr, 3, 4)
+     * Func::isHasValue([1, 2, 3], 3, 4)
      * // true
      * ```
+     *
      * @param array $arr
      * @param mixed ...$values
      * @return bool
+     *
+     * @see ChainIs::hasValue()
+     * @see ChainFuncIs::hasValue()
      */
     public static function isHasValue(array $arr, ...$values): bool
     {
         foreach ($arr as $item) {
-            if (in_array($item, $values)) {
+            if (in_array($item, $values, true)) {
                 return true;
             }
         }
@@ -477,24 +397,24 @@ class Func
     }
 
     /**
-     * Проверка, что значение поля `field` равно хотя бы одному из переданных значений `values`.
+     * Проверка, что значение поля `field` равно хотя бы одному из переданных значений `values`. Используется строгое сравнение `===`.
      *
      * ```
-     * $arr = ['a' => 1, 'b' => 2];
-     *
-     * Chain::from($arr)->is->fieldHasValue('a', 1, 10);
-     * ChainFunc::from($arr)->is->fieldHasValue('a', 1, 10);
-     * Func::isFieldHasValue($arr, 'a', 1, 10);
+     * Func::isFieldHasValue(['a' => 1, 'b' => 2], 'a', 1, 10);
      * // true
      * ```
+     *
      * @param array $arr
      * @param int|string $field
      * @param mixed ...$values
      * @return bool
+     *
+     * @see ChainIs::fieldHasValue()
+     * @see ChainFuncIs::fieldHasValue()
      */
     public static function isFieldHasValue(array $arr, $field, ...$values): bool
     {
-        if (in_array($arr[$field], $values)) {
+        if (in_array($arr[$field], $values, true)) {
             return true;
         }
 
@@ -505,16 +425,16 @@ class Func
      * Проверка, присутствует ли в массиве хотя бы один ключ из `keys`.
      *
      * ```
-     * $arr = ['a' => 1, 'b' => 2];
-     *
-     * Chain::from($arr)->is->hasKey('a', 'd');
-     * ChainFunc::from($arr)->is->hasKey('a', 'd');
-     * Func::isHasKey($arr, 'a', 'd');
+     * Func::isHasKey(['a' => 1, 'b' => 2], 'a', 'd');
      * // true
      * ```
+     *
      * @param array $arr
      * @param int|string ...$keys
      * @return bool
+     *
+     * @see ChainIs::hasKey()
+     * @see ChainFuncIs::hasKey()
      */
     public static function isHasKey(array $arr, ...$keys): bool
     {
@@ -532,15 +452,16 @@ class Func
      * Удалить повторяющиеся значения. Ключи сохраняются.
      *
      * ```
-     * ChainFunc::from([1,1,2])->unique()
-     * Chain::from([1,1,2])->unique()->toArray()
      * Func::unique([1,1,2])
      * // [0 => 1, 2 => 2]
      * ```
      *
      * @param array $arr
      * @return array
-     * @link https://www.php.net/manual/ru/function.array-unique.php php.net - array_unique
+     *
+     * @link https://www.php.net/manual/ru/function.array-unique.php Php.net - array_unique
+     * @see Chain::unique()
+     * @see ChainFunc::unique()
      */
     public static function unique(array $arr): array
     {
@@ -548,7 +469,7 @@ class Func
     }
 
     /**
-     * Удалить повторяющиеся элементы, на основе возвращаемых функцией `$callback` значений. Ключи сохраняются.
+     * Удалить повторяющиеся элементы на основе возвращаемых функцией `$callback` значений. Ключи сохраняются.
      *
      * ```
      * $first = new stdClass();
@@ -565,8 +486,6 @@ class Func
      *
      * $arr = ['a' => $first, 'b' => $second, 'c' => $third, 'd' => $fourth];
      *
-     * Chain::from($arr)->unique->by(fn(stdClass $item, string $key) => $item->value)->toArray();
-     * ChainFunc::from($arr)->unique->by(fn(stdClass $item, string $key) => $item->value);
      * Func::uniqueBy($arr, fn(stdClass $item, string $key) => $item->value);
      * // ['a' => $first, 'b' => $second, 'd' => $fourth],
      * ```
@@ -574,6 +493,9 @@ class Func
      * @param array $arr
      * @param callable $callback
      * @return array
+     *
+     * @see ChainUnique::by()
+     * @see ChainFuncUnique::by()
      */
     public static function uniqueBy(array $arr, callable $callback): array
     {
@@ -596,8 +518,8 @@ class Func
      * Параметры callback функции - `$result`, `$element`, `$key`.
      *
      * ```
-     * ChainFunc::from([1, 2, 3])->reduce(fn(int $res, int $item) => $res + $item, 0)
-     * Chain::from([1, 2, 3])->reduce(fn(int $res, int $item) => $res + $item, 0)
+     * Cf::from([1, 2, 3])->reduce(fn(int $res, int $item) => $res + $item, 0)
+     * Ch::from([1, 2, 3])->reduce(fn(int $res, int $item) => $res + $item, 0)
      * Func::reduce([1, 2, 3], fn(int $res, int $item) => $res + $item, 0)
      * // 6
      *
@@ -605,18 +527,13 @@ class Func
      * // [ 'a', 1, 'b', 2]
      * ```
      *
-     * Для Chain, если аргумент `$startVal` имеет тип `array`, то `Chain->reduce` вернёт `Chain` и цепочку можно продолжить. В ином случае вернётся само значение.
-     * ```
-     * Chain::from([1, 2, 3])->reduce(fn(int $res, int $item) => $res + $item, 0)
-     * // 0
-     * Chain::from([1, 2, 3])->reduce(fn(int $res, int $item) => [...$res, $item])->toArray()
-     * // [1, 2, 3]
-     * ```
-     *
      * @param array $arr
      * @param callable $callback
      * @param mixed $startVal
      * @return array|mixed
+     *
+     * @see Chain::reduce()
+     * @see ChainFunc::reduce()
      */
     public static function reduce(array $arr, callable $callback, $startVal = [])
     {
@@ -633,14 +550,16 @@ class Func
      * Пройти по массиву и выполнить функцию. Не предназначен для изменения массива, только для сайд-эффектов.
      *
      * ```
-     * ChainFunc::from([1,2,3])->each(fn(int $item, string $key) => echo $key . $item)
-     * Chain::from([1,2,3])->each(fn(int $item, string $key) => echo $key . $item)->toArray()
-     * Func::each([1,2,3], fn(int $item, string $key) => echo $key . $item)
-     * // [1,2,3]
+     * Func::each([1, 2, 3], fn(int $item, string $key) => echo $key . $item);
+     * // [1, 2, 3]
      * ```
+     *
      * @param array $arr
      * @param callable $callback
      * @return array
+     *
+     * @see Chain::each()
+     * @see ChainFunc::each()
      */
     public static function each(array $arr, callable $callback): array
     {
@@ -655,31 +574,15 @@ class Func
      * Получить количество элементов.
      *
      * ```
-     * ChainFunc::from([1,2,3])->count()
-     * Chain::from([1,2,3])->count()
-     * Func::count([1,2,3])
+     * Func::count([1, 2, 3]);
      * // 3
-     * ```
-     * Для дочерних элементов:
-     * ```
-     * $arr = [
-     *   'a.a' => [
-     *     'a.a.a' => [1, 2, 3],
-     *     'a.a.b' => [1, 2]
-     *   ]
-     * ];
-     * Chain::from($arr)->elems->elems->count()->toArray();
-     * ChainFunc::from($arr)->elems->elems->count();
-     * // $arr = [
-     * //  'a.a' => [
-     * //    'a.a.a' => 3
-     * //    'a.a.b' => 2
-     * //  ]
-     * // ];
      * ```
      *
      * @param array $arr
      * @return int
+     *
+     * @see Chain::count()
+     * @see ChainFunc::count()
      */
     public static function count(array $arr): int
     {
@@ -690,15 +593,16 @@ class Func
      * Кодировать в json поля с перечисленными ключами. Для json задан флаг `JSON_UNESCAPED_UNICODE`.
      *
      * ```
-     * ChainFunc::from(['a'=>['f'=>1], 'b'=>['f'=>2], 'c'=>['f'=>3]])->json->encodeFields('a', 'b')
-     * Chain::from(['a'=>['f'=>1],'b'=>['f'=>2], 'c'=>['f'=>3]])->json->encodeFields('a', 'b')->toArray()
-     * Func::jsonEncodeFields(['a'=>['f'=>1], 'b'=>['f'=>2], 'c'=>['f'=>3]], 'a', 'b')
+     * Func::jsonEncodeFields(['a'=>['f'=>1], 'b'=>['f'=>2], 'c'=>['f'=>3]], 'a', 'b');
      * // ['a'=>'{"f":1}','b'=>'{"f":2}', 'c'=>['f'=>3]]
      * ```
      *
      * @param array $arr
      * @param string|int ...$keys
      * @return array
+     *
+     * @see ChainJson::encodeFields()
+     * @see ChainFuncJson::encodeFields()
      */
     public static function jsonEncodeFields(array $arr, ...$keys): array
     {
@@ -717,15 +621,16 @@ class Func
      * Кодировать в json поля, для который `$callback` вернул `true`. Для json задан флаг `JSON_UNESCAPED_UNICODE`.
      *
      * ```
-     * ChainFunc::from(['a'=>['f'=>1], 'b'=>['f'=>2], 'c'=>['f'=>3]])->json->encodeBy(fn(string $item, string $key) => $item === ['f' => 1] || $key === 'b')
-     * Chain::from(['a'=>['f'=>1], 'b'=>['f'=>2], 'c'=>['f'=>3]])->json->encodeBy(fn(string $item, string $key) => $item === ['f' => 1] || $key === 'b')->toArray()
-     * Func::jsonEncodeBy(['a'=>['f'=>1], 'b'=>['f'=>2], 'c'=>['f'=>3]], fn(array $item, string $key) => $item === ['f' => 1] || $key === 'b')
+     * Func::jsonEncodeBy(['a'=>['f'=>1], 'b'=>['f'=>2], 'c'=>['f'=>3]], fn(array $item, string $key) => $item === ['f' => 1] || $key === 'b');
      * // ['a'=>'{"f":1}','b'=>'{"f":2}', 'c'=>['f'=>3]]
      * ```
      *
      * @param array $arr
      * @param callable $callback
      * @return array
+     *
+     * @see ChainJson::encodeBy()
+     * @see ChainFuncJson::encodeBy()
      */
     public static function jsonEncodeBy(array $arr, callable $callback): array
     {
@@ -744,8 +649,6 @@ class Func
      * Декодировать из json поля с перечисленными ключами.
      *
      * ```
-     * ChainFunc::from(['a'=>'{"f":1}', 'b'=>'{"f":2}', 'c'=>'{"f":3}'])->json->decodeFields('a', 'b')
-     * Chain::from(['a'=>'{"f":1}', 'b'=>'{"f":2}', 'c'=>'{"f":3}'])->json->decodeFields('a', 'b')->toArray()
      * Func::jsonDecodeFields(['a'=>'{"f":1}', 'b'=>'{"f":2}', 'c'=>'{"f":3}'], 'a', 'b')
      * // ['a'=>['f'=>1], 'b'=>['f'=>2], 'c'=>'{"f":3}']
      * ```
@@ -753,6 +656,9 @@ class Func
      * @param array $arr
      * @param ...$keys
      * @return array
+     *
+     * @see ChainJson::decodeFields()
+     * @see ChainFuncJson::decodeFields()
      */
     public static function jsonDecodeFields(array $arr, ...$keys): array
     {
@@ -771,8 +677,6 @@ class Func
      * Декодировать из json поля, для которых `$callback` вернул `true`.
      *
      * ```
-     *  ChainFunc::from(['a'=>'{"f":1}', 'b'=>'{"f":2}', 'c'=>'{"f":3}'])->json->decodeBy(fn(string $item, string $key) => $item === '{"f":1}' || $key === 'b')
-     *  Chain::from(['a'=>'{"f":1}', 'b'=>'{"f":2}', 'c'=>'{"f":3}'])->json->decodeBy(fn(string $item, string $key) => $item === '{"f":1}' || $key === 'b')->toArray()
      *  Func::jsonDecodeBy(['a'=>'{"f":1}', 'b'=>'{"f":2}', 'c'=>'{"f":3}'], fn(string $item, string $key) => $item === '{"f":1}' || $key === 'b')
      *  // ['a'=>['f'=>1], 'b'=>['f'=>2], 'c'=>'{"f":3}']
      * ```
@@ -780,6 +684,9 @@ class Func
      * @param array $arr
      * @param callable $callback
      * @return array
+     *
+     * @see ChainJson::decodeBy()
+     * @see ChainFuncJson::decodeBy()
      */
     public static function jsonDecodeBy(array $arr, callable $callback): array
     {
@@ -796,18 +703,21 @@ class Func
 
 
     /**
-     * Добавить элементы в конец массива.
+     * Добавить элементы в конец массива. Элементы добавляются как есть.
      *
      * ```
-     * ChainFunc::from([1, 2])->append(3, 4)
-     * Chain::from([1,2])->append(3, 4)->toArray()
-     * Func::append([1,2], 3, 4)
+     * Func::append([1, 2], 3, 4);
      * // [1, 2, 3, 4]
-     * ```
      *
+     * Func::append([1, 2], [3, 4]);
+     * // [1, 2, [3, 4]]
+     * ```
      * @param array $arr
-     * @param array|mixed ...$items
+     * @param mixed ...$items
      * @return array
+     * @see Cf::append()
+     *
+     * @see Ch::append()
      */
     public static function append(array $arr, ...$items): array
     {
@@ -815,19 +725,23 @@ class Func
     }
 
     /**
-     * Добавить элементы в конец массива. Если элемент итерируемый - то будет выполнено слияние. Неитерируемые элементы будут добавлены как есть.
+     * Добавить элементы в конец коллекции. Если элемент итерируемый - то будет выполнено слияние. Неитерируемые элементы будут добавлены как есть.
      *
      * ```
      * $arr = [1, 2];
      *
-     * Chain::from($arr)->append->merge(3, [4, 5, [6, 7]])->toArray();
-     * ChainFunc::from($arr)->append->merge(3, [4, 5, [6, 7]]);
+     * Func::appendMerge($arr, 3, [4, 5]);
+     * // [1, 2, 3, 4, 5]
+     *
      * Func::appendMerge($arr, 3, [4, 5, [6, 7]]);
      * // [1, 2, 3, 4, 5, [6, 7]]
      * ```
      * @param array $arr
-     * @param ...$items
+     * @param mixed ...$items
      * @return array
+     *
+     * @see ChainAppend::merge()
+     * @see ChainFuncAppend::merge()
      */
     public static function appendMerge(array $arr, ...$items): array
     {
@@ -849,14 +763,15 @@ class Func
      * ```
      * $arr = [1, 2];
      *
-     * Chain::from($arr)->append->mergeFromJson('[3,4,5,[6,7]]')->toArray();
-     * ChainFunc::from($arr)->append->mergeFromJson('[3,4,5,[6,7]]');
-     * Func::appendMergeFromJson($arr, '[3,4,5,[6,7]]');
+     * Func::appendMergeFromJson($arr, '[3, 4, 5, [6, 7]]');
      * // [1, 2, 3, 4, 5, [6, 7]]
      * ```
      * @param array $arr
      * @param string $json
      * @return array
+     *
+     * @see ChainAppend::mergeFromJson()
+     * @see ChainFuncAppend::mergeFromJson()
      */
     public static function appendMergeFromJson(array $arr, string $json): array
     {
@@ -866,20 +781,22 @@ class Func
     }
 
     /**
-     * Конвертировать строку в массив и добавить в конец массива (с распаковкой итерируемых элементов)
+     * Конвертировать строку в массив и добавить в конец массива (с распаковкой итерируемых элементов).
      *
      * ```
      * $arr = [1, 2];
      *
-     * Chain::from($arr)->append->mergeFromString('3,4,5', ',')->toArray();
-     * ChainFunc::from($arr)->append->mergeFromString('3,4,5', ',');
-     * Func::appendMergeFromJson($arr, '3,4,5', ',');
+     * Func::appendMergeFromString($arr, '3,4,5', ',');
      * // [1, 2, 3, 4, 5]
      * ```
+     *
      * @param array $arr
      * @param string $str
      * @param string $delimiter
      * @return array
+     *
+     * @see ChainAppend::mergeFromString()
+     * @see ChainFuncAppend::mergeFromString()
      */
     public static function appendMergeFromString(array $arr, string $str, string $delimiter): array
     {
@@ -890,18 +807,19 @@ class Func
 
 
     /**
-     * Добавить элементы в начало массива.
+     * Добавить элементы в начало коллекции.
      *
      * ```
-     * ChainFunc::from([3, 4])->prepend(1,2)
-     * Chain::from([3, 4])->prepend(1,2)->toArray()
-     * Func::prepend([3, 4], 1, 2)
+     * Func::prepend([3, 4], 1, 2);
      * // [1, 2, 3, 4]
      * ```
      *
      * @param array $arr
-     * @param array|mixed ...$items
+     * @param mixed ...$items
      * @return array
+     *
+     * @see Chain::prepend()
+     * @see ChainFunc::prepend()
      */
     public static function prepend(array $arr, ...$items): array
     {
@@ -914,14 +832,18 @@ class Func
      * ```
      * $arr = [1, 2];
      *
-     * Chain::from($arr)->prepend->merge(3, [4, 5, [6, 7]])->toArray();
-     * ChainFunc::from($arr)->prepend->merge(3, [4, 5, [6, 7]]);
+     * Ch::from($arr)->prepend->merge(3, [4, 5, [6, 7]])->toArray();
+     * Cf::from($arr)->prepend->merge(3, [4, 5, [6, 7]]);
      * Func::prependMerge($arr, 3, [4, 5, [6, 7]]);
      * // [1, 2, 3, 4, 5, [6, 7]]
      * ```
+     *
      * @param array $arr
      * @param ...$items
      * @return array
+     *
+     * @see ChainPrepend::merge()
+     * @see ChainFuncPrepend::merge()
      */
     public static function prependMerge(array $arr, ...$items): array
     {
@@ -943,14 +865,18 @@ class Func
      * ```
      * $arr = [1, 2];
      *
-     * Chain::from($arr)->prepend->mergeFromJson('[3,4,5,[6,7]]')->toArray();
-     * ChainFunc::from($arr)->prepend->mergeFromJson('[3,4,5,[6,7]]');
+     * Ch::from($arr)->prepend->mergeFromJson('[3,4,5,[6,7]]')->toArray();
+     * Cf::from($arr)->prepend->mergeFromJson('[3,4,5,[6,7]]');
      * Func::prependMergeFromJson($arr, '[3,4,5,[6,7]]');
      * // [1, 2, 3, 4, 5, [6, 7]]
      * ```
+     *
      * @param array $arr
      * @param string $json
      * @return array
+     *
+     * @see ChainPrepend::mergeFromJson()
+     * @see ChainFuncPrepend::mergeFromJson()
      */
     public static function prependMergeFromJson(array $arr, string $json): array
     {
@@ -965,15 +891,19 @@ class Func
      * ```
      * $arr = [1, 2];
      *
-     * Chain::from($arr)->prepend->mergeFromString('3,4,5', ',')->toArray();
-     * ChainFunc::from($arr)->prepend->mergeFromString('3,4,5', ',');
+     * Ch::from($arr)->prepend->mergeFromString('3,4,5', ',')->toArray();
+     * Cf::from($arr)->prepend->mergeFromString('3,4,5', ',');
      * Func::prependMergeFromJson($arr, '3,4,5', ',');
      * // [1, 2, 3, 4, 5]
      * ```
+     *
      * @param array $arr
      * @param string $str
      * @param string $delimiter
      * @return array
+     *
+     * @see ChainPrepend::mergeFromString()
+     * @see ChainFuncPrepend::mergeFromString()
      */
     public static function prependMergeFromString(array $arr, string $str, string $delimiter): array
     {
@@ -984,24 +914,24 @@ class Func
 
 
     /**
-     * Оставить элементы в массиве, для которых $callback вернёт true. Ключи сохраняются.
+     * Оставить элементы коллекции, для которых $callback вернёт true. Ключи сохраняются.
      *
      * Параметры callback функции - `$element`, `$key`
      *
      * ```
-     * ChainFunc::from([1,2,3])->filter(fn(int $item) => $item > 2)
-     * Chain::from([1,2,3])->filter(fn(int $item) => $item > 2)->toArray()
-     * Func::filter([1,2,3], fn(int $item) => $item > 2)
+     * Func::filter([1, 2, 3], fn(int $item) => $item > 2)
      * // [2 => 3]
      *
      * Func::filter(['a' => 1, 'b' => 2, 'c' => 3], fn(int $item, string $key) => $item > 1 && $key !== 'b' )
      * // ['c' => 3]
      * ````
      *
-     *
      * @param array $arr
      * @param callable $callback
      * @return array
+     *
+     * @see Chain::filter()
+     * @see ChainFunc::filter()
      */
     public static function filter(array $arr, callable $callback): array
     {
@@ -1017,56 +947,57 @@ class Func
     }
 
     /**
-     * Оставить только элементы коллекции с указанными ключами. Используется нестрогое сравнение `==`.
+     * Оставить только элементы коллекции с указанными ключами. Используется строгое сравнение `===`.
      *
      * ```
-     * ChainFunc::from(['a' => 1, 'b' => 2, 'c' => 3])->filter->keys('a', 'b')
-     * Chain::from(['a' => 1, 'b' => 2, 'c' => 3])->filter->keys('a', 'b')->toArray()
-     * Func::filterKeys(['a' => 1, 'b' => 2, 'c' => 3], 'a', 'b')
+     * Func::filterKeys(['a' => 1, 'b' => 2, 'c' => 3], 'a', 'b');
      * // ['a' => 1, 'b' => 2]
      * ```
      * @param array $arr
      * @param string|int ...$keys
      * @return array
+     *
+     * @see ChainFilter::keys()
+     * @see ChainFuncFilter::keys()
      */
     public static function filterKeys(array $arr, ...$keys): array
     {
-        return array_filter($arr, fn($key) => in_array($key, $keys), ARRAY_FILTER_USE_KEY);
+        return array_filter($arr, fn($key) => in_array($key, $keys, true), ARRAY_FILTER_USE_KEY);
     }
 
     /**
-     * Оставить только элементы из коллекции с указанными значениями. Используется нестрогое сравнение `==`. Ключи сохраняются.
+     * Оставить только элементы из коллекции с указанными значениями. Используется строгое сравнение `===`. Ключи сохраняются.
      *
      * ```
-     * ChainFunc::from(['a' => 1, 'b' => 2, 'c' => 3])->filter->values(1, '2')
-     * Chain::from(['a' => 1, 'b' => 2, 'c' => 3])->filter->values(1, '2')->toArray()
-     * Func::filterValues(['a' => 1, 'b' => 2, 'c' => 3], 1, '2')
+     * Func::filterValues(['a' => 1, 'b' => 2, 'c' => 3], 1, '2');
      * // ['a' => 1, 'b' => 2]
      * ```
      *
      * @param array $arr
      * @param mixed ...$values
      * @return array
+     *
+     * @see ChainFilter::values()
+     * @see ChainFuncFilter::values()
      */
     public static function filterValues(array $arr, ...$values): array
     {
-        return array_filter($arr, fn($value) => in_array($value, $values));
+        return array_filter($arr, fn($value) => in_array($value, $values, true));
     }
 
     /**
      * Преобразовать стиль ключей к "camelCase".
      *
      * ```
-     * $arr = ['var_first' => 1, 'var_second' => 2];
-     *
-     * Chain::from($arr)->keys->case->toCamel()->toArray()
-     * ChainFunc::from($arr)->keys->case->toCamel()
-     * Func::keysCaseToCamel($arr)
+     * Func::keysCaseToCamel(['var_first' => 1, 'var_second' => 2]);
      * // ['varFirst' => 1, 'varSecond' => 2]
      * ```
      *
      * @param array $arr
      * @return array
+     *
+     * @see ChainKeysCase::toCamel()
+     * @see ChainFuncKeysCase::toCamel()
      */
     public static function keysCaseToCamel(array $arr): array
     {
@@ -1084,16 +1015,15 @@ class Func
      * Преобразовать стиль ключей к "PaskalCase".
      *
      * ```
-     * $arr = ['var_first' => 1, 'var_second' => 2];
-     *
-     * Chain::from($arr)->keys->case->toPaskal()->toArray()
-     * ChainFunc::from($arr)->keys->case->toPaskal()
-     * Func::keysCaseToPaskal($arr)
+     * Func::keysCaseToPaskal(['var_first' => 1, 'var_second' => 2])
      * // ['VarFirst' => 1, 'VarSecond' => 2]
      * ```
      *
      * @param array $arr
      * @return array
+     *
+     * @see ChainKeysCase::toPaskal()
+     * @see ChainFuncKeysCase::toPaskal()
      */
     public static function keysCaseToPaskal(array $arr): array
     {
@@ -1110,16 +1040,15 @@ class Func
      * Преобразовать стиль ключей к "snake_case".
      *
      * ```
-     * $arr = ['varFirst' => 1, 'varSecond' => 2];
-     *
-     * Chain::from($arr)->keys->case->toSnake()->toArray();
-     * ChainFunc::from($arr)->keys->case->toSnake();
-     * Func::keysCaseToSnake($arr);
+     * Func::keysCaseToSnake(['varFirst' => 1, 'varSecond' => 2]);
      * // ['var_first' => 1, 'var_second' => 2]
      * ```
      *
      * @param array $arr
      * @return array
+     *
+     * @see ChainKeysCase::toSnake()
+     * @see ChainFuncKeysCase::toSnake()
      */
     public static function keysCaseToSnake(array $arr): array
     {
@@ -1136,16 +1065,15 @@ class Func
      * Преобразовать стиль ключей к "kebab-case".
      *
      * ```
-     * $arr = ['varFirst' => 1, 'varSecond' => 2];
-     *
-     * Chain::from($arr)->keys->case->toKebab()->toArray();
-     * ChainFunc::from($arr)->keys->case->toKebab();
-     * Func::keysCaseToKebab($arr);
+     * Func::keysCaseToKebab(['varFirst' => 1, 'varSecond' => 2]);
      * // ['var-first' => 1, 'var-second' => 2]
      * ```
      *
      * @param array $arr
      * @return array
+     *
+     * @see ChainKeysCase::toKebab()
+     * @see ChainFuncKeysCase::toKebab()
      */
     public static function keysCaseToKebab(array $arr): array
     {
@@ -1162,16 +1090,15 @@ class Func
      * Преобразовать стиль ключей к "SCREAM_SNAKE_CASE".
      *
      * ```
-     * $arr = ['varFirst' => 1, 'varSecond' => 2];
-     *
-     * Chain::from($arr)->keys->case->toScreamSnake()->toArray();
-     * ChainFunc::from($arr)->keys->case->toScreamSnake();
-     * Func::keysCaseToScreamSnake($arr);
+     * Func::keysCaseToScreamSnake(['varFirst' => 1, 'varSecond' => 2]);
      * // ['VAR_FIRST' => 1, 'VAR_SECOND' => 2]
      * ```
      *
      * @param array $arr
      * @return array
+     *
+     * @see ChainKeysCase::toScreamSnake()
+     * @see ChainFuncKeysCase::toScreamSnake()
      */
     public static function keysCaseToScreamSnake(array $arr): array
     {
@@ -1188,16 +1115,15 @@ class Func
      * Преобразовать стиль ключей к "SCREAM-KEBAB-CASE".
      *
      * ```
-     * $arr = ['varFirst' => 1, 'varSecond' => 2];
-     *
-     * Chain::from($arr)->keys->case->toScreamKebab()->toArray();
-     * ChainFunc::from($arr)->keys->case->toScreamKebab();
-     * Func::keysCaseToScreamKebab($arr);
+     * Func::keysCaseToScreamKebab(['varFirst' => 1, 'varSecond' => 2]);
      * // ['VAR-FIRST' => 1, 'VAR-SECOND' => 2]
      * ```
      *
      * @param array $arr
      * @return array
+     *
+     * @see ChainKeysCase::toScreamKebab()
+     * @see ChainFuncKeysCase::toScreamKebab()
      */
     public static function keysCaseToScreamKebab(array $arr): array
     {
@@ -1215,40 +1141,19 @@ class Func
      *
      * Параметры callback функции - `$element`, `$key`.
      * ```
-     * $arr = ['a' => 1, 'b' => 2];
-     *
-     * Chain::from($arr)->find(fn(int $item, string $key) => $item == 1);
-     * ChainFunc::from($arr)->find(fn(int $item, string $key) => $item == 1);
-     * Func::find($arr, fn(int $item, string $key) => $item == 1);
+     * Func::find(['a' => 1, 'b' => 2], fn(int $item, string $key) => $item == 1);
      * // 1
      *
-     * Func::find($arr, fn(int $item, string $key) => $key == 'a');
+     * Func::find(['a' => 1, 'b' => 2], fn(int $item, string $key) => $key == 'a');
      * // 1
-     * ```
-     * Для дочерних элементов:
-     * ```
-     * $arr = [
-     *   'a' => [
-     *     'a.a' => [
-     *       'a.a.a' => 1,
-     *       'a.a.b' => 2
-     *     ],
-     *   'b' => [5, 6]
-     *   ]
-     * ];
-     * Chain::from($arr)->elems->elems->find(fn(int $item) => $item == 1);
-     * ChainFunc::from($arr)->elems->elems->find(fn(int $item) => $item == 1);
-     * // [
-     * //   'a' => [
-     * //     'a.a' => 1
-     * //   ]
-     * //   'b' => null
-     * // ]
      * ```
      *
      * @param array $arr
      * @param callable $callback
      * @return mixed
+     *
+     * @see Chain::find()
+     * @see ChainFunc::find()
      */
     public static function find(array $arr, callable $callback)
     {
@@ -1267,13 +1172,9 @@ class Func
      * Параметры callback функции - `$element`, `$key`.
      *
      * ```
-     * $arr = [1,2,3,4,5];
-     *
-     * Chain::from($arr)->group(fn(int $item) => $item > 3 ? 'more' : 'less')->toArray();
-     * ChainFunc::from($arr)->group(fn(int $item) => $item > 3 ? 'more' : 'less');
-     * Func::group($arr, fn(int $item) => $item > 3 ? 'more' : 'less')
+     * Func::group([1, 2, 3, 4, 5], fn(int $item) => $item > 3 ? 'more' : 'less')
      * // [
-     * //   'less' => [1,2,3],
+     * //   'less' => [1, 2, 3],
      * //   'more' => [4,5]
      * // ]
      * ```
@@ -1281,6 +1182,9 @@ class Func
      * @param array $arr
      * @param callable $callback
      * @return array
+     *
+     * @see Chain::group()
+     * @see ChainFunc::group()
      */
     public static function group(array $arr, callable $callback): array
     {
@@ -1296,7 +1200,7 @@ class Func
     }
 
     /**
-     * Сгруппировать элементы на основе значений поля $field. Если указанного поля в элементе нет, то он попадёт в группу с пустым ключом `''`.
+     * Сгруппировать элементы на основе значений поля `$field`. Если указанного поля в элементе нет, то он попадёт в группу с пустым ключом `''`.
      *
      * ```
      * $arr = [
@@ -1305,8 +1209,6 @@ class Func
      *   ['a' => 3],
      * ];
      *
-     * Chain::from($arr)->group->byField('a')->toArray();
-     * ChainFunc::from($arr)->group->byField('a');
      * Func::groupByField($arr, 'a');
      * // [
      * //    1 => [
@@ -1318,6 +1220,7 @@ class Func
      * //    ],
      * //  ],
      * ```
+     *
      * Отсутствующее поле:
      * ```
      * $arr = [
@@ -1341,6 +1244,9 @@ class Func
      * @param array $arr
      * @param string|int $field
      * @return array
+     *
+     * @see ChainGroup::byField()
+     * @see ChainFuncGroup::byField()
      */
     public static function groupByField(array $arr, $field): array
     {
@@ -1356,11 +1262,11 @@ class Func
     }
 
     /**
-     * Сгруппировать элементы на основе значений, которые вернёт callback функция, и привести к структуре
+     * Сгруппировать элементы на основе значений, которые вернёт callback функция, и привести к структуре вида
      *
      * `['key' => ..., 'items' => [...]]`.
      *
-     * Актуально, если возвращаемое значение не является валидным ключом массива (например, объекты). Сравнение ключей производится через сериализацию (метод `serialize`).
+     * Актуально, если возвращаемое значение не является валидным ключом массива (например, объекты). Сравнение ключей производится через сериализацию (функция `serialize`).
      *
      * ```
      * $first = new stdClass();
@@ -1377,8 +1283,6 @@ class Func
      *
      * $arr = [$first, $second, $third, $fourth];
      *
-     * Chain::from($arr)->group->toStruct(fn($item) => $item)->toArray();
-     * ChainFunc::from($arr)->group->toStruct(fn($item) => $item);
      * Func::groupToStruct($arr);
      * // [
      * //   ['key' => $first, 'items' => [$first, $third]],
@@ -1386,9 +1290,13 @@ class Func
      * //   ['key' => $fourth, 'items' => [$fourth]],
      * // ],
      * ```
+     *
      * @param array $arr
      * @param callable $callback
      * @return array
+     *
+     * @see ChainGroup::toStruct()
+     * @see ChainFuncGroup::toStruct()
      */
     public static function groupToStruct(array $arr, callable $callback): array
     {
@@ -1405,60 +1313,21 @@ class Func
     }
 
     /**
-     * Заменить массив списком ключей.
+     * Возвращает массив ключей.
      *
      * ```
-     * $arr = ['a' =>1, 'b' => 2, 'c' => 3];
-     *
-     * Chain::from($arr)->keys()->toArray();
-     * ChainFunc::from($arr)->keys();
-     * Func::keys($arr);
+     * Func::keys(['a' => 1, 'b' => 2, 'c' => 3]);
      * // ['a', 'b', 'c']
      * ```
+     *
      * @param array $arr
      * @return array
+     *
+     * @link https://www.php.net/manual/ru/function.array-keys.php Php.net - array_keys
+     * @see Chain::keys()
+     * @see ChainFunc::keys()
      */
     public static function keys(array $arr): array
-    {
-        return array_keys($arr);
-    }
-
-    /**
-     * Получить список ключей.
-     *
-     * ```
-     * $arr = ['a' =>1, 'b' => 2, 'c' => 3];
-     *
-     * Chain::from($arr)->keys->getList();
-     * ChainFunc::from($arr)->keys->getList();
-     * Func::keysGetList($arr);
-     * // ['a', 'b', 'c']
-     * ```
-     * Для дочерних элементов:
-     * ```
-     * $arr = [
-     *   'a' => [
-     *     'a.a' => [
-     *       'a.a.a' => 1,
-     *       'a.a.b' => 2,
-     *     ]
-     *   ]
-     * ];
-     * Chain::from($arr)->elems->elems->keys->getList()->toArray();
-     * ChainFunc::from($arr)->elems->elems->keys->getList();
-     * // [
-     * //   'a' => [
-     * //     'a.a' => [
-     * //       'a.a.a',
-     * //       'a.a.b',
-     * //    ]
-     * //   ]
-     * // ],
-     * ```
-     * @param array $arr
-     * @return array
-     */
-    public static function keysGetList(array $arr): array
     {
         return array_keys($arr);
     }
@@ -1469,16 +1338,16 @@ class Func
      * Параметры callback функции - `$key`, `$element`
      *
      * ```
-     * $arr = ['a' =>1, 'b' => 2, 'c' => 3];
-     * Chain::from($arr)->keys->map(fn(string $key, int $item) => $key . $item)->toArray();
-     * ChainFunc::from($arr)->keys->map(fn(string $key, int $item) => $key . $item);
-     * Func::keysMap($arr, fn(string $key, int $item) => $key . $item);
+     * Func::keysMap(['a' =>1, 'b' => 2, 'c' => 3], fn(string $key, int $item) => $key . $item);
      * // ['a1' =>1, 'b2' => 2, 'c3' => 3];
      * ```
      *
      * @param array $arr
      * @param callable $callback
      * @return array
+     *
+     * @see ChainKeys::map()
+     * @see ChainFuncKeys::map()
      */
     public static function keysMap(array $arr, callable $callback): array
     {
@@ -1501,8 +1370,6 @@ class Func
      *  ['id' => 20, 'val' => 'b'],
      * ]
      *
-     * Chain::from($arr)->keys->fromField('id')->toArray();
-     * ChainFunc::from($arr)->keys->fromField('id');
      * Func::keysFromField($arr, 'id');
      * // $arr = [
      * //   10 => ['id' => 10, 'val' => 'a'],
@@ -1513,6 +1380,9 @@ class Func
      * @param array $arr
      * @param string|int $field
      * @return array
+     *
+     * @see ChainKeys::fromField()
+     * @see ChainFuncKeys::fromField()
      */
     public static function keysFromField(array $arr, $field): array
     {
@@ -1529,34 +1399,16 @@ class Func
      * Получить ключ по номеру в массиве. Нумерация начинается с 0.
      *
      * ```
-     * $arr = ['a' => 1, 'b' => 2];
-     *
-     * Chain::from($arr)->keys->get(1);
-     * ChainFunc::from($arr)->keys->get(1);
-     * Func::keysGet($arr, 1);
+     * Func::keysGet(['a' => 1, 'b' => 2], 1);
      * // 'b'
      * ```
-     * Для дочерних элементов:
-     * ```
-     * $arr = [
-     *   'a' => [
-     *     'a.a' => ['a' => 10, 'b' => 'a'],
-     *     'a.b' => ['a' => 10, 'b' => 'a']
-     *   ],
-     * ];
      *
-     * Chain::from($arr)->elems->elems->keys->get(1)->toArray();
-     * ChainFunc::from($arr)->elems->elems->keys->get(1);
-     * // [
-     * //   'a' => [
-     * //     'a.a' => 'b',
-     * //     'a.b' => 'b',
-     * //   ]
-     * // ],
-     * ```
      * @param array $arr
      * @param int $number
      * @return int|string|null
+     *
+     * @see ChainKeys::get()
+     * @see ChainFuncKeys::get()
      */
     public static function keysGet(array $arr, int $number)
     {
@@ -1569,73 +1421,36 @@ class Func
      * Получить первый ключ массива.
      *
      * ```
-     * $arr = ['a' => 1, 'b' => 2];
-     *
-     * Chain::from($arr)->keys->getFirst();
-     * ChainFunc::from($arr)->keys->getFirst();
-     * Func::keysGetFirst($arr);
+     * Func::keysGetFirst(['a' => 1, 'b' => 2]);
      * // 'a'
      * ```
-     * Для дочерних элементов:
-     * ```
-     * $arr = [
-     *   'a' => [
-     *     'a.a' => ['a' => 10, 'b' => 'a'],
-     *     'a.b' => ['a' => 10, 'b' => 'a']
-     *   ],
-     * ];
      *
-     * Chain::from($arr)->elems->elems->keys->getFirst->toArray();
-     * ChainFunc::from($arr)->elems->elems->keys->getFirst();
-     * // [
-     * //   'a' => [
-     * //     'a.a' => 'a',
-     * //     'a.b' => 'a',
-     * //   ]
-     * // ],
-     * ```
-     * @link https://www.php.net/manual/ru/function.array-key-first.php php.net - array_key_first
      * @param array $arr
      * @return int|string|null
+     *
+     * @link https://www.php.net/manual/ru/function.array-key-first.php php.net - Php.net - array_key_first
+     * @see ChainKeys::getFirst()
+     * @see ChainFuncKeys::getFirst()
      */
     public static function keysGetFirst(array $arr)
     {
         return array_key_first($arr);
     }
 
-
     /**
      * Получить последний ключ массива.
      *
      * ```
-     * $arr = ['a' => 1, 'b' => 2];
-     *
-     * Chain::from($arr)->keys->getLast();
-     * ChainFunc::from($arr)->keys->getLast();
-     * Func::keysGetLast($arr);
+     * Func::keysGetLast(['a' => 1, 'b' => 2]);
      * // 'b'
      * ```
-     * Для дочерних элементов:
-     * ```
-     * $arr = [
-     *   'a' => [
-     *     'a.a' => ['a' => 10, 'b' => 'a'],
-     *     'a.b' => ['a' => 10, 'b' => 'a']
-     *   ],
-     * ];
      *
-     * Chain::from($arr)->elems->elems->keys->getLast->toArray();
-     * ChainFunc::from($arr)->elems->elems->keys->getLast();
-     * // [
-     * //   'a' => [
-     * //     'a.a' => 'b',
-     * //     'a.b' => 'b',
-     * //   ]
-     * // ],
-     * ```
-     * @link https://www.php.net/manual/ru/function.array-key-last.php php.net - array_key_last
      * @param array $arr
      * @return int|string|null
+     *
+     * @link https://www.php.net/manual/ru/function.array-key-last.php php.net - Php.net - array_key_last
+     * @see ChainKeys::getLast()
+     * @see ChainFuncKeys::getLast()
      */
     public static function keysGetLast(array $arr)
     {
@@ -1647,12 +1462,8 @@ class Func
      * Сортировка массива. Используется функция usort.
      *
      * ```
-     * $arr = [3,1,2];
-     *
-     * Chain::from($arr)->sort(fn(int $a, int $b) => $a <=> $b)->toArray();
-     * ChainFunc::from($arr)->sort(fn(int $a, int $b) => $a <=> $b);
-     * Func::sort($arr, fn(int $a, int $b) => $a <=> $b));
-     * // [1,2,3]
+     * Func::sort([3, 1, 2], fn(int $a, int $b) => $a <=> $b));
+     * // [1, 2, 3]
      * ```
      *
      * Сортировка строк:
@@ -1666,7 +1477,7 @@ class Func
      * // [1, 2, 3, 11]
      * ```
      *
-     * ### Компараторы для строк:
+     * ##### Компараторы для строк:
      * - `strcasecmp` — сравнивает строки без учёта регистра в бинарно безопасном режиме, [подробнее](https://www.php.net/manual/ru/function.strcasecmp.php)
      * - `strcmp` — сравнивает строки в бинарно-безопасном режиме: как последовательности байтов [подробнее](https://www.php.net/manual/ru/function.strcmp.php)
      * - `strnatcasecmp` — сравнивает строки без учёта регистра по алгоритму natural order [подробнее](https://www.php.net/manual/ru/function.strnatcasecmp.php)
@@ -1674,12 +1485,14 @@ class Func
      * - `strncasecmp` — сравнивает первые n символов строк без учёта регистра в бинарно-безопасном режиме [подробнее](https://www.php.net/manual/ru/function.strncasecmp.php)
      * - `strncmp` — сравнивает первые n символов строк в бинарно безопасном режиме [подробнее](https://www.php.net/manual/ru/function.strncmp.php)
      *
-     * @link https://www.php.net/manual/ru/function.usort.php функция usort
-     * @link https://www.php.net/manual/ru/ref.strings.php методы строк (в том числе компараторы)
-     *
      * @param array $arr
      * @param callable $callback
      * @return array
+     *
+     * @link https://www.php.net/manual/ru/function.usort.php Php.net - функция usort
+     * @link https://www.php.net/manual/ru/ref.strings.php Php.net - методы строк (в том числе компараторы)
+     * @see Chain::sort()
+     * @see ChainFunc::sort()
      */
     public static function sort(array $arr, callable $callback): array
     {
@@ -1692,22 +1505,21 @@ class Func
      * Очистить массив.
      *
      * ```
-     * Chain::from([1,2,3])->clear()->toArray()
-     * ChainFunc::from([1,2,3])->clear()->toArray()
-     * Func::clear([1,2,3])
+     * Ch::from([1, 2, 3])->clear()->toArray()
+     * Cf::from([1, 2, 3])->clear()->toArray()
+     * Func::clear([1, 2, 3])
      * // []
      *
      * $arr = [
      *  'a' => [1,2],
      *  'b' => [3,4]
      * ]
-     * ChainFunc::from($arr)->elems->clear()
+     * Cf::from($arr)->elems->clear()
      * // [
      * //   'a' => [],
      * //   'b' => []
      * // ]
      * ```
-     *
      *
      * @param array $arr
      * @return array
@@ -1723,11 +1535,7 @@ class Func
      * Если аргумент `isPreserveKeys` равен `true`, ключи оригинального массива будут сохранены. По умолчанию - `false`, что переиндексирует части числовыми ключами. Если массив не лист - то ключи сохраняются всегда.
      *
      * ```
-     * $arr = [1, 2, 3, 4, 5];
-     *
-     * Chain::from($arr)->chunk->bySize($arr, 2)->toArray();
-     * ChainFunc::from($arr)->chunk->bySize($arr, 2);
-     * Func::chunkBySize($arr, 2);
+     * Func::chunkBySize([1, 2, 3, 4, 5], 2);
      * // [
      * //   [1, 2],
      * //   [3, 4],
@@ -1747,7 +1555,9 @@ class Func
      * @param bool $isPreserveKeys
      * @return array
      *
-     * @link https://www.php.net/manual/ru/function.array-chunk.php php.net - array_chunk
+     * @link https://www.php.net/manual/ru/function.array-chunk.php Php.net - array_chunk
+     * @see ChainChunk::bySize()
+     * @see ChainFuncChunk::bySize()
      */
     public static function chunkBySize(array $arr, int $size, bool $isPreserveKeys = false): array
     {
@@ -1760,28 +1570,28 @@ class Func
      * Если аргумент `isPreserveKeys` равен `true`, ключи оригинального массива будут сохранены. По умолчанию - `false`, что переиндексирует части числовыми ключами. Если массив не лист - то ключи сохраняются всегда.
      *
      * ```
-     * $arr = [1, 2, 3, 4, 5];
-     *
-     * Chain::from($arr)->chunk->byCount(3)->toArray();
-     * ChainFunc::from($arr)->chunk->byCount(3);
-     * Func::chunkByCount($arr, 3);
+     * Func::chunkByCount([1, 2, 3, 4, 5], 3);
      * // [
      * //  [1, 2],
      * //  [3, 4],
      * //  [5]
      * // ]
      *
-     * Func::chunkByCount($arr, 3, true);
+     * Func::chunkByCount([1, 2, 3, 4, 5], 3, true);
      * // [
      * //   [0 => 1, 1 => 2],
      * //   [2 => 3, 3 => 4],
      * //   [4 => 5],
      * // ],
      * ```
+     *
      * @param array $arr
      * @param int $count
      * @param bool $isPreserveKeys
      * @return array
+     *
+     * @see ChainChunk::byCount()
+     * @see ChainFuncChunk::byCount()
      */
     public static function chunkByCount(array $arr, int $count, bool $isPreserveKeys = false): array
     {
@@ -1813,17 +1623,16 @@ class Func
      * Меняет местами ключи с их значениями в массиве. Повторяющиеся ключи будут молча перезаписаны. Если значение не является корректным ключом (`string` или `int`), будет выдано предупреждение и данная пара ключ/значение не будет включена в результат.
      *
      * ```
-     * $arr = ['a' => 10, 'b' => 20, 'c' => 30];
-     *
-     * Chain::from($arr)->flip()->toArray();
-     * ChainFunc::from($arr)->flip();
-     * Func::flip($arr);
-     *
+     * Func::flip(['a' => 10, 'b' => 20, 'c' => 30]);
      * // ['10' => 'a', '20' => 'b', '30' => 'c'];
      * ```
-     * @link https://www.php.net/manual/ru/function.array-flip.php php.net - array_flip
+     *
      * @param array $arr
      * @return array
+     *
+     * @link https://www.php.net/manual/ru/function.array-flip.php Php.net - array_flip
+     * @see Chain::flip()
+     * @see ChainFunc::flip()
      */
     public static function flip(array $arr): array
     {
@@ -1833,52 +1642,24 @@ class Func
     /**
      * Извлекает и возвращает первое значение массива array, сокращает массив array на один элемент и сдвигает остальные элементы в начало. Числовые ключи массива изменятся так, чтобы нумерация начиналась с нуля, тогда как литеральные ключи не изменятся.
      *
-     * Функция возвращает извлечённое значение или null, если массив array оказался пустым
+     * Функция возвращает извлечённое значение или null, если массив array оказался пустым.
      *
      * ```
      * $arr = [1, 2, 3];
-     * $arrFunc = [1, 2, 3];
-     * $ch = Chain::from([1, 2, 3]);
-     * $cf = ChainFunc::from([1, 2, 3]);
      *
-     * $ch->shift();
-     * $cf->shift();
-     * Func::shift($arrFunc);
+     * Func::shift($arr);
      * // 1
      *
      * $arr;
-     * $arrFunc
-     * $ch->toArray();
-     * $cf->toArray();
      * // [2, 3]
      * ```
-     * Для вложенных элементов:
-     * ```
-     * $arr = [
-     *   'a' => [
-     *     'a.a' => [1, 2, 3],
-     *     'a.b' => [4, 5, 6],
-     *   ]
-     * ];
-     * $ch = Chain::from($arr);
-     * $cf = ChainFunc::from($arr);
      *
-     * $ch->elems->elems->shift();
-     * $cf->elems->elems->shift();
-     * // [1, 4];
-     *
-     * $ch->toArray();
-     * $cf->toArray();
-     * // [
-     * //   'a' => [
-     * //     'a.a' => [2, 3],
-     * //     'a.b' => [5, 6],
-     * //   ]
-     * // ],
-     * ```
-     * @link https://www.php.net/manual/ru/function.array-shift.php php.net - array_shift
      * @param array $arr
      * @return mixed|null
+     *
+     * @link https://www.php.net/manual/ru/function.array-shift.php Php.net - array_shift
+     * @see Chain::shift()
+     * @see ChainFunc::shift()
      */
     public static function shift(array &$arr)
     {
@@ -1888,51 +1669,23 @@ class Func
     /**
      * Извлекает и возвращает последнее значение массива array, сокращает массив array на один элемент.
      *
-     * Функция возвращает извлечённое значение или null, если массив array оказался пустым
+     * Функция возвращает извлечённое значение или null, если массив array оказался пустым.
      *
      * ```
      * $arr = [1, 2, 3];
-     * $arrFunc = [1, 2, 3];
-     * $ch = Chain::from([1, 2, 3]);
-     * $cf = ChainFunc::from([1, 2, 3]);
-     *
-     * $ch->pop();
-     * $cf->pop();
-     * Func::pop($arrFunc);
+     * Func::pop($arr);
      * // 3
      *
      * $arr;
-     * $arrFunc;
-     * $ch->toArray();
-     * $cf->toArray();
      * // [1, 2]
      * ```
-     * Для вложенных элементов:
-     * ```
-     * $arr = [
-     *   'a' => [
-     *     'a.a' => [1, 2, 3],
-     *     'a.b' => [4, 5, 6],
-     *   ]
-     * ];
-     * $ch = Chain::from($arr);
-     * $cf = ChainFunc::from($arr);
      *
-     * $ch->elems->elems->pop();
-     * $cf->elems->elems->pop();
-     * // [3, 6];
-     *
-     * $ch->toArray();
-     * // [
-     * //   'a' => [
-     * //     'a.a' => [1, 2],
-     * //     'a.b' => [4, 5],
-     * //   ]
-     * // ],
-     * ```
-     * @link https://www.php.net/manual/ru/function.array-pop.php php.net - array_shift
+     * @link https://www.php.net/manual/ru/function.array-pop.php Php.net - array_shift
      * @param array $arr
      * @return mixed|null
+     *
+     * @see Chain::pop()
+     * @see ChainFunc::pop()
      */
     public static function pop(array &$arr)
     {
@@ -1944,53 +1697,22 @@ class Func
      *
      * ```
      * $arr = [1, 2, 3, 4];
-     * $arrFunc = [1, 2, 3, 4];
-     * $ch = Chain::from($arr);
-     * $cf = ChainFunc::from($arr);
-     *
-     * $ch->splice(2, 1, 'item');
-     * $cf->splice(2, 1, 'item');
-     * Func::splice($arrFunc, 2, 1, 'item');
+     * Func::splice($arr, 2, 1, 'item');
      * // [3]
      *
      * $arr;
-     * $arrFunc;
-     * $ch->toArray();
-     * $cf->toArray();
      * // [1, 2, 'item', 4]
      * ```
-     * Для вложенных элементов:
-     * ```
-     * $arr = [
-     *   'a' => [
-     *     'a.a' => [1, 2, 3, 4],
-     *     'a.b' => [5, 6, 7, 8],
-     *   ]
-     * ];
-     * $ch = Chain::from($arr);
-     * $cf = ChainFunc::from($arr);
      *
-     * $ch->elems->elems->splice(2, 1, 'item');
-     * $cf->elems->elems->splice(2, 1, 'item');
-     * // [
-     * //   [3],
-     * //   [7],
-     * // ]
-     *
-     * $ch->toArray();
-     * $cf->toArray();
-     * // [
-     * //   'a' => [
-     * //     'a.a' => [1, 2, 'item', 4],
-     * //     'a.b' => [5, 6, 'item', 8],
-     * //   ]
-     * // ],
-     * ```
      * @param array $arr
      * @param int $offset
      * @param int|null $length
      * @param mixed $replacement
-     * @return void
+     * @return array
+     *
+     * @link https://www.php.net/manual/ru/function.array-splice.php Php.net - array_splice
+     * @see Chain::splice
+     * @see ChainFunc::splice
      */
     public static function splice(array &$arr, int $offset, ?int $length = null, $replacement = []): array
     {
@@ -2002,52 +1724,20 @@ class Func
      *
      * ```
      * $arr = [1, 2, 3, 4];
-     * $arrFunc = [1, 2, 3, 4];
-     * $ch = Chain::from($arr);
-     * $cf = ChainFunc::from($arr);
-     *
-     * $ch->splice->head(2, 'item');
-     * $cf->splice->head(2, 'item');
-     * Func::spliceHead($arrFunc, 2, 1, 'item');
+     * Func::spliceHead($arr, 2, 1, 'item');
      * // [1, 2]
      *
      * $arr;
-     * $arrFunc;
-     * $ch->toArray();
-     * $cf->toArray();
      * // ['item', 3, 4]
      *  ```
-     * Для вложенных элементов:
-     * ```
-     * $arr = [
-     *   'a' => [
-     *     'a.a' => [1, 2, 3, 4],
-     *     'a.b' => [5, 6, 7, 8],
-     *   ]
-     * ];
-     * $ch = Chain::from($arr);
-     * $cf = ChainFunc::from($arr);
      *
-     * $ch->elems->elems->splice->head(2, 'item');
-     * $cf->elems->elems->splice->head(2, 'item');
-     * // [
-     * //   [1, 2],
-     * //   [5, 6],
-     * // ]
-     *
-     * $ch->toArray();
-     * $cf->toArray();
-     * // [
-     * //   'a' => [
-     * //     'a.a' => ['item', 3, 4],
-     * //     'a.b' => ['item', 7, 8],
-     * //   ]
-     * // ],
-     *  ```
      * @param array $arr
      * @param int|null $length
      * @param mixed $replacement
      * @return array
+     *
+     * @see ChainSplice::head
+     * @see ChainFuncSplice::head
      */
     public static function spliceHead(array &$arr, ?int $length = null, $replacement = []): array
     {
@@ -2059,52 +1749,20 @@ class Func
      *
      * ```
      * $arr = [1, 2, 3, 4];
-     * $arrFunc = [1, 2, 3, 4];
-     * $ch = Chain::from($arr);
-     * $cf = ChainFunc::from($arr);
-     *
-     * $ch->splice->tail(2, 'item');
-     * $cf->splice->tail(2, 'item');
-     * Func::spliceTail($arrFunc, 2, 1, 'item');
+     * Func::spliceTail($arr, 2, 1, 'item');
      * // [1, 2]
      *
      * $arr;
-     * $arrFunc;
-     * $ch->toArray();
-     * $cf->toArray();
      * // ['item', 3, 4]
      *  ```
-     * Для вложенных элементов:
-     * ```
-     * $arr = [
-     *   'a' => [
-     *     'a.a' => [1, 2, 3, 4],
-     *     'a.b' => [5, 6, 7, 8],
-     *   ]
-     * ];
-     * $ch = Chain::from($arr);
-     * $cf = ChainFunc::from($arr);
      *
-     * $ch->elems->elems->splice->tail(2, 'item');
-     * $cf->elems->elems->splice->tail(2, 'item');
-     * // [
-     * //   [1, 2],
-     * //   [5, 6],
-     * // ]
-     *
-     * $ch->toArray();
-     * $cf->toArray();
-     * // [
-     * //   'a' => [
-     * //     'a.a' => ['item', 3, 4],
-     * //     'a.b' => ['item', 7, 8],
-     * //   ]
-     * // ],
-     *  ```
      * @param array $arr
      * @param int|null $length
      * @param mixed $replacement
      * @return array
+     *
+     * @see ChainSplice::tail
+     * @see ChainFuncSplice::tail
      */
     public static function spliceTail(array &$arr, ?int $length = null, $replacement = []): array
     {
@@ -2128,20 +1786,22 @@ class Func
      * Если смещение больше длины массива, то будет возвращён пустой массив.
      * ```
      * $arr = [10 => 1, 2, 3, 4, 5];
-     * Chain::from($arr)->slice(1, 2)->toArray();
-     * ChainFunc::from($arr)->slice(1, 2);
      * Func::slice($arr, 1, 2);
      * // [1, 2]
      *
      * Func::slice($arr, 1, 2, true);
      * // [10 => 1, 11 => 2]
      * ```
-     * @link https://www.php.net/manual/ru/function.array-slice.php php.net - array_slice
+     *
      * @param array $arr
      * @param int $offset
      * @param int|null $length
      * @param bool $isPreserveKeys
      * @return array
+     *
+     * @link https://www.php.net/manual/ru/function.array-slice.php Php.net - array_slice
+     * @see Chain::slice()
+     * @see ChainFunc::slice()
      */
     public static function slice(array $arr, int $offset, ?int $length = null, bool $isPreserveKeys = false): array
     {
@@ -2153,8 +1813,6 @@ class Func
      *
      * ```
      * $arr = [10 => 1, 2, 3, 4, 5];
-     * Chain::from($arr)->slice->head(2)->toArray();
-     * ChainFunc::from($arr)->slice->head(2);
      * Func::sliceHead($arr, 2);
      * // [1, 2]
      *
@@ -2166,6 +1824,9 @@ class Func
      * @param int $length
      * @param bool $isPreserveKeys
      * @return array
+     *
+     * @see ChainSlice::head()
+     * @see ChainFuncSlice::head()
      */
     public static function sliceHead(array $arr, int $length, bool $isPreserveKeys = false): array
     {
@@ -2179,8 +1840,6 @@ class Func
      *
      * ```
      * $arr = [10 => 1, 2, 3, 4, 5];
-     * Chain::from($arr)->slice->tail(2)->toArray();
-     * ChainFunc::from($arr)->slice->tail(2);
      * Func::sliceTail($arr, 2);
      * // [4, 5]
      *
@@ -2192,6 +1851,9 @@ class Func
      * @param int $length
      * @param bool $isPreserveKeys
      * @return array
+     *
+     * @see ChainSlice::tail()
+     * @see ChainFuncSlice::tail()
      */
     public static function sliceTail(array $arr, int $length, bool $isPreserveKeys = false): array
     {
@@ -2207,15 +1869,17 @@ class Func
      * ```
      * $arr = [1, 2, 3, 4, 5];
      *
-     * Chain::from($arr)->replace([6, 7], [4 => 8])->toArray();
-     * ChainFunc::from($arr)->replace([6, 7], [4 => 8]);
      * Func::replace($arr, [6, 7], [4 => 8]);
      * // [6, 7, 3, 4, 8];
      * ```
-     * @link https://www.php.net/manual/ru/function.array-replace.php php.net - array_replace
+     *
      * @param array $array
      * @param array ...$replacements
      * @return array
+     *
+     * @link https://www.php.net/manual/ru/function.array-replace.php Php.net - array_replace
+     * @see Chain::replace()
+     * @see ChainFunc::replace()
      */
     public static function replace(array $array, array ...$replacements): array
     {
@@ -2237,18 +1901,20 @@ class Func
      *   1 => [2 => 9]
      * ];
      *
-     * Chain::from($arr)->replace->recursive($arrReplace1, $arrReplace2)->toArray();
-     * ChainFunc::from($arr)->replace->recursive($arrReplace1, $arrReplace2);
      * Func::replace($arr, $arrReplace1, $arrReplace2);
      * // [
-     * //  [1, 2, 3],
-     * //  [4, 7, 9],
+     * //   [1, 2, 3],
+     * //   [4, 7, 9],
      * // ]
      * ```
-     * @link https://www.php.net/manual/ru/function.array-replace-recursive.php - array_replace_recursive
+     *
      * @param array $array
      * @param array ...$replacements
      * @return array
+     *
+     * @link https://www.php.net/manual/ru/function.array-replace-recursive.php Php.net - array_replace_recursive
+     * @see ChainReplace::recursive()
+     * @see ChainFuncReplace::recursive()
      */
     public static function replaceRecursive(array $array, array ...$replacements): array
     {
@@ -2261,17 +1927,19 @@ class Func
      * ```
      * $arr = [1, [2], [3, [4, [5]]]];
      *
-     * Chain::from($arr)->flatten()->toArray();
-     * ChainFunc::from($arr)->flatten();
      * Func::flatten($arr);
      * // [1, 2, 3, [4, [5]]];
      *
      * Func::flatten($arr, 2);
      * // [1, 2, 3, 4, [5]];
      * ```
+     *
      * @param array $arr
      * @param int $depth
      * @return array
+     *
+     * @see Chain::flatten()
+     * @see ChainFunc::flatten()
      */
     public static function flatten(array $arr, int $depth = 1): array
     {
@@ -2289,18 +1957,20 @@ class Func
     }
 
     /**
-     * Убрать вложенность массива.
+     * Полностью убрать вложенность массива.
      *
      * ```
      * $arr = [1, [2], [3, [4, [5]]]];
      *
-     * Chain::from($arr)->flatten->all()->toArray();
-     * ChainFunc::from($arr)->flatten->all();
      * Func::flattenAll($arr);
      * // [1, 2, 3, 4, 5];
      * ```
+     *
      * @param array $arr
      * @return array
+     *
+     * @see ChainFlatten::all()
+     * @see ChainFuncFlatten::all()
      */
     public static function flattenAll(array $arr): array
     {
@@ -2321,21 +1991,21 @@ class Func
      * Дополняет массив значением до заданной длины. Если `length` больше нуля, то добавляет в конец массива, если меньше - в начало.
      *
      * ```
-     * $arr = [1, 2];
-     *
-     * Chain::from($arr)->pad(5, 0)->toArray();
-     * ChainFunc::from($arr)->pad(5, 0);
-     * Func::pad($arr, 5, 0);
+     * Func::pad([1, 2], 5, 0);
      * // [1, 2, 0, 0, 0]
      *
-     * Func::pad($arr, -5, 0);
+     * Func::pad([1, 2], -5, 0);
      * // [0, 0, 0, 1, 2]
      * ```
-     * @link https://www.php.net/manual/ru/function.array-pad.php php.net - array_pad
+     *
+     * @link https://www.php.net/manual/ru/function.array-pad.php Php.net - array_pad
      * @param array $arr
      * @param int $length
      * @param mixed $value
      * @return array
+     *
+     * @see Chain::pad()
+     * @see ChainFunc::pad()
      */
     public static function pad(array $arr, int $length, $value): array
     {
@@ -2346,18 +2016,18 @@ class Func
      * Получить элемент к ключом `$key`. Если такого элемента нет - вернётся `null`
      *
      * ```
-     * $arr = [1,2,3];
-     *
-     * Func::get($arr, 1);
-     * Chain::from($arr)->get(1);
-     * ChainFunc::from($arr)->get(1);
+     * Func::get([1, 2, 3], 1);
      * // 2
      *
-     * Func::get($arr, 10);
+     * Func::get([1, 2, 3], 10);
      * // null
      * ```
+     *
      * @param string|int $key
      * @return mixed|null
+     *
+     * @see Chain::get()
+     * @see ChainFunc::get()
      */
     public static function get(array $arr, $key)
     {
@@ -2365,23 +2035,23 @@ class Func
     }
 
     /**
-     *  Получить элемент к ключом `$key`. Если такого элемента нет - вернётся $val
+     *  Получить элемент к ключом `$key`. Если такого элемента нет - вернётся $val.
      *
      *  ```
-     *  $arr = [1,2,3];
-     *
-     *  Func::getOrElse($arr, 1, 'else');
-     *  Chain::from($arr)->get->orElse(1, 'else');
-     *  ChainFunc::from($arr)->get->orElse(1, 'else');
+     *  Func::getOrElse([1, 2, 3], 1, 'else');
      *  // 2
      *
-     *  Func::getOrElse($arr, 10, 'else');
+     *  Func::getOrElse([1, 2, 3], 10, 'else');
      *  // 'else'
      *  ```
+     *
      * @param array $arr
      * @param string|int $key
      * @param mixed $val
      * @return mixed|null
+     *
+     * @see Chain::getOrElse()
+     * @see ChainFunc::getOrElse()
      */
     public static function getOrElse(array $arr, $key, $val)
     {
@@ -2392,20 +2062,20 @@ class Func
      * Получить элемент к ключом `$key`. Если такого элемента нет - будет брошено исключение `NotFoundException`
      *
      * ```
-     * $arr = [1,2,3];
-     *
-     * Func::getOrElse($arr, 1);
-     * Chain::from($arr)->get->orElse(1);
-     * ChainFunc::from($arr)->get->orElse(1);
+     * Func::getOrElse([1, 2, 3], 1);
      * // 2
      *
-     * Func::getOrElse($arr, 10);
+     * Func::getOrElse([1, 2, 3], 10);
      * // NotFoundException
-     *   ```
+     * ```
+     *
      * @param array $arr
      * @param string|int $key
      * @return mixed
      * @throws NotFoundException
+     *
+     * @see ChainGet::orException()
+     * @see ChainFuncGet::orException()
      */
     public static function getOrException(array $arr, $key)
     {
@@ -2417,22 +2087,22 @@ class Func
     }
 
     /**
-     * Получить элемент по номеру в массиве. Если такого элемента нет - вернётся `null`
+     * Получить элемент по номеру в массиве. Если такого элемента нет - вернётся `null`.
      *
      * ```
-     * $arr = ['a' => 1, 'b' => 2, 'c' => 3];
-     *
-     * Chain::from($arr)->get->byNumber(1);
-     * ChainFunc::from($arr)->get->byNumber(1);
-     * Func::getByNumber($arr, 1);
+     * Func::getByNumber(['a' => 1, 'b' => 2, 'c' => 3], 1);
      * // 2
      *
      * Func::getByNumber($arr, 10);
      * // null
      * ```
+     *
      * @param array $arr
      * @param int $number
      * @return mixed|null
+     *
+     * @see ChainGet::byNumber()
+     * @see ChainFuncGet::byNumber()
      */
     public static function getByNumber(array $arr, int $number)
     {
@@ -2442,23 +2112,23 @@ class Func
     }
 
     /**
-     * Получить элемент по номеру в массиве. Если такого элемента нет - вернётся `$val`
+     * Получить элемент по номеру в массиве. Если такого элемента нет - вернётся `$val`.
      *
      * ```
-     * $arr = ['a' => 1, 'b' => 2, 'c' => 3];
-     *
-     * Chain::from($arr)->get->byNumberOrElse(1, 'else');
-     * ChainFunc::from($arr)->get->byNumberOrElse(1, 'else');
-     * Func::getByNumberOrElse($arr, 1, 'else');
+     * Func::getByNumberOrElse(['a' => 1, 'b' => 2, 'c' => 3], 1, 'else');
      * // 2
      *
-     * Func::getByNumberOrElse($arr, 10, 'else');
+     * Func::getByNumberOrElse(['a' => 1, 'b' => 2, 'c' => 3], 10, 'else');
      * // 'else'
      * ```
+     *
      * @param array $arr
      * @param int $number
      * @param mixed $val
      * @return mixed
+     *
+     * @see ChainGet::byNumberOrElse()
+     * @see ChainFuncGet::byNumberOrElse()
      */
     public static function getByNumberOrElse(array $arr, int $number, $val)
     {
@@ -2468,23 +2138,23 @@ class Func
     }
 
     /**
-     * Получить элемент с ключом `$key`. Если такого элемента нет - будет брошено исключение `NotFoundException`
+     * Получить элемент с ключом `$key`. Если такого элемента нет - будет брошено исключение `NotFoundException`.
      *
      * ```
-     * $arr = [1,2,3];
-     *
-     * Chain::from($arr)->get->byNumberOrException(1);
-     * ChainFunc::from($arr)->get->byNumberOrException(1);
-     * Func::getByNumberOrException($arr, 1);
+     * Func::getByNumberOrException([1, 2, 3], 1);
      * // 2
      *
-     * Func::getByNumberOrException($arr, 10);
+     * Func::getByNumberOrException([1, 2, 3], 10);
      * // NotFoundException
-     *   ```
+     * ```
+     *
      * @param array $arr
      * @param int $number
      * @return mixed
      * @throws NotFoundException
+     *
+     * @see ChainGet::byNumberOrException()
+     * @see ChainFuncGet::byNumberOrException()
      */
     public static function getByNumberOrException(array $arr, int $number)
     {
@@ -2498,21 +2168,21 @@ class Func
     }
 
     /**
-     * Получить первый элемент массива. Если такого элемента нет (массив пустой) - вернётся `null`
+     * Получить первый элемент массива. Если такого элемента нет (массив пустой) - вернётся `null`.
      *
      * ```
-     * $arr = ['a' => 1, 'b' => 2, 'c' => 3];
-     *
-     * Chain::from($arr)->get->first();
-     * ChainFunc::from($arr)->get->first();
-     * Func::getFirst($arr);
+     * Ch::from(['a' => 1, 'b' => 2, 'c' => 3])->get->first();
      * // 1
      *
      * Func::getFirst([]);
      * // null
      * ```
+     *
      * @param array $arr
      * @return mixed|null
+     *
+     * @see ChainGet::first()
+     * @see ChainFuncGet::first()
      */
     public static function getFirst(array $arr)
     {
@@ -2522,22 +2192,22 @@ class Func
     }
 
     /**
-     * Получить первый элемент массива. Если такого элемента нет (массив пустой) - вернётся `$val`
+     * Получить первый элемент массива. Если такого элемента нет (массив пустой) - вернётся `$val`.
      *
      * ```
-     * $arr = ['a' => 1, 'b' => 2, 'c' => 3];
-     *
-     * Chain::from($arr)->get->firstOrElse('else');
-     * ChainFunc::from($arr)->get->firstOrElse('else');
-     * Func::getFirstOrElse($arr, 'else');
+     * Func::getFirstOrElse(['a' => 1, 'b' => 2, 'c' => 3], 'else');
      * // 1
      *
      * Func::getFirstOrElse([], 'else');
      * // 'else'
      * ```
+     *
      * @param array $arr
      * @param mixed $val
      * @return mixed|null
+     *
+     * @see ChainGet::firstOrElse()
+     * @see ChainFuncGet::firstOrElse()
      */
     public static function getFirstOrElse(array $arr, $val)
     {
@@ -2548,22 +2218,22 @@ class Func
 
 
     /**
-     * Получить первый элемент массива. Если такого элемента нет (массив пустой) - будет брошено исключение `NotFoundException`
+     * Получить первый элемент массива. Если такого элемента нет (массив пустой) - будет брошено исключение `NotFoundException`.
      *
      * ```
-     * $arr = [1,2,3];
-     *
-     * Chain::from($arr)->get->firstOrException();
-     * ChainFunc::from($arr)->get->firstOrException();
-     * Func::getFirstOrException($arr);
+     * Func::getFirstOrException([1, 2, 3]);
      * // 1
      *
      * Func::getFirstOrException([]);
      * // NotFoundException
-     *   ```
+     * ```
+     *
      * @param array $arr
      * @return mixed
      * @throws NotFoundException
+     *
+     * @see ChainGet::firstOrException()
+     * @see ChainFuncGet::firstOrException()
      */
     public static function getFirstOrException(array $arr)
     {
@@ -2577,21 +2247,21 @@ class Func
     }
 
     /**
-     * Получить последний элемент массива. Если такого элемента нет (массив пустой) - вернётся `null`
+     * Получить последний элемент массива. Если такого элемента нет (массив пустой) - вернётся `null`.
      *
      * ```
-     * $arr = ['a' => 1, 'b' => 2, 'c' => 3];
-     *
-     * Chain::from($arr)->get->last();
-     * ChainFunc::from($arr)->get->last();
-     * Func::getLast($arr);
+     * Func::getLast(['a' => 1, 'b' => 2, 'c' => 3]);
      * // 3
      *
      * Func::getLast([]);
      * // null
      * ```
+     *
      * @param array $arr
      * @return mixed|null
+     *
+     * @see ChainGet::last()
+     * @see ChainFuncGet::last()
      */
     public static function getLast(array $arr)
     {
@@ -2601,22 +2271,22 @@ class Func
     }
 
     /**
-     * Получить последний элемент массива. Если такого элемента нет (массив пустой) - вернётся `$val`
+     * Получить последний элемент массива. Если такого элемента нет (массив пустой) - вернётся `$val`.
      *
      * ```
-     * $arr = ['a' => 1, 'b' => 2, 'c' => 3];
-     *
-     * Chain::from($arr)->get->lastOrElse('else');
-     * ChainFunc::from($arr)->get->lastOrElse('else');
-     * Func::getLastOrElse($arr, 'else');
+     * Func::getLastOrElse(['a' => 1, 'b' => 2, 'c' => 3], 'else');
      * // 3
      *
      * Func::getLastOrElse([], 'else');
      * // 'else'
      * ```
+     *
      * @param array $arr
      * @param mixed $val
      * @return mixed|null
+     *
+     * @see ChainGet::lastOrElse()
+     * @see ChainFuncGet::lastOrElse()
      */
     public static function getLastOrElse(array $arr, $val)
     {
@@ -2627,22 +2297,22 @@ class Func
 
 
     /**
-     * Получить последний элемент массива. Если такого элемента нет (массив пустой) - будет брошено исключение `NotFoundException`
+     * Получить последний элемент массива. Если такого элемента нет (массив пустой) - будет брошено исключение `NotFoundException`.
      *
      * ```
-     * $arr = [1,2,3];
-     *
-     * Chain::from($arr)->get->lastOrException();
-     * ChainFunc::from($arr)->get->lastOrException();
-     * Func::getLastOrException($arr);
+     * Func::getLastOrException([1, 2, 3]);
      * // 3
      *
      * Func::getLastOrException([]);
      * // NotFoundException
-     *   ```
+     * ```
+     *
      * @param array $arr
      * @return mixed
      * @throws NotFoundException
+     *
+     * @see ChainGet::lastOrException()
+     * @see ChainFuncGet::lastOrException()
      */
     public static function getLastOrException(array $arr)
     {

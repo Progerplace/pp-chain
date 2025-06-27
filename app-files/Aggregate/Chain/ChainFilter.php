@@ -18,10 +18,17 @@ class ChainFilter
     }
 
     /**
-     * Подробности {@see Func::filterKeys()}
+     * Оставить только элементы коллекции с указанными ключами. Используется строгое сравнение `===`.
      *
+     * ```
+     * Ch::from(['a' => 1, 'b' => 2, 'c' => 3])->filter->keys('a', 'b')->toArray();
+     * // ['a' => 1, 'b' => 2]
+     * ```
      * @param string|int ...$keys
      * @return Chain
+     *
+     * @see ChainFilter::keys()
+     * @see Func::filterKeys()
      */
     public function keys(...$keys): Chain
     {
@@ -32,10 +39,18 @@ class ChainFilter
     }
 
     /**
-     * Подробности {@see Func::filterValues()}
+     * Оставить только элементы из коллекции с указанными значениями. Используется строгое сравнение `===`. Ключи сохраняются.
+     *
+     * ```
+     * Ch::from(['a' => 1, 'b' => 2, 'c' => 3])->filter->values(1, '2')->toArray();
+     * // ['a' => 1, 'b' => 2]
+     * ```
      *
      * @param mixed ...$values
      * @return Chain
+     *
+     * @see ChainFuncFilter::values()
+     * @see Func::filterValues()
      */
     public function values(...$values): Chain
     {

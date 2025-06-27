@@ -19,9 +19,19 @@ class ChainFuncFlatten
     }
 
     /**
-     * Подробности {@see Func::flattenAll()}
+     * Полностью убрать вложенность массива.
+     *
+     * ```
+     * $arr = [1, [2], [3, [4, [5]]]];
+     *
+     * Cf::from($arr)->flatten->all();
+     * // [1, 2, 3, 4, 5];
+     * ```
      *
      * @return array
+     *
+     * @see Func::flattenAll()
+     * @see ChainFlatten::all()
      */
     public function all(): array
     {

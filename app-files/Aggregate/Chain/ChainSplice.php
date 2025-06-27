@@ -18,11 +18,49 @@ class ChainSplice
     }
 
     /**
-     * Подробности {@see Func::spliceHead()}
+     * Удаляет часть массива с начала массива и заменяет её новыми элементами.
+     *
+     * ```
+     * $arr = [1, 2, 3, 4];
+     * $ch = Ch::from($arr);
+     *
+     * $ch->splice->head(2, 'item');
+     * // [1, 2]
+     *
+     * $ch->toArray();
+     * // ['item', 3, 4]
+     * ```
+     * Для вложенных элементов:
+     * ```
+     * $arr = [
+     *   'a' => [
+     *     'a.a' => [1, 2, 3, 4],
+     *     'a.b' => [5, 6, 7, 8],
+     *   ]
+     * ];
+     * $ch = Ch::from($arr);
+     *
+     * $ch->elems->elems->splice->head(2, 'item');
+     * // [
+     * //   [1, 2],
+     * //   [5, 6],
+     * // ]
+     *
+     * $ch->toArray();
+     * // [
+     * //   'a' => [
+     * //     'a.a' => ['item', 3, 4],
+     * //     'a.b' => ['item', 7, 8],
+     * //   ]
+     * // ]
+     * ```
      *
      * @param int|null $length
      * @param mixed $replacement
      * @return Chain|array
+     *
+     * @see Func::spliceHead()
+     * @see ChainFuncSplice::head()
      */
     public function head(?int $length = null, $replacement = [])
     {
@@ -38,11 +76,49 @@ class ChainSplice
     }
 
     /**
-     * Подробности {@see Func::spliceTail()}
+     * Удаляет часть массива с конца массива и заменяет её новыми элементами
+     *
+     * ```
+     * $arr = [1, 2, 3, 4];
+     * $ch = Ch::from($arr);
+     *
+     * $ch->splice->tail(2, 'item');
+     * // [1, 2]
+     *
+     * $ch->toArray();
+     * // ['item', 3, 4]
+     * ```
+     * Для вложенных элементов:
+     * ```
+     * $arr = [
+     *   'a' => [
+     *     'a.a' => [1, 2, 3, 4],
+     *     'a.b' => [5, 6, 7, 8],
+     *   ]
+     * ];
+     * $ch = Ch::from($arr);
+     *
+     * $ch->elems->elems->splice->tail(2, 'item');
+     * // [
+     * //   [1, 2],
+     * //   [5, 6],
+     * // ]
+     *
+     * $ch->toArray();
+     * // [
+     * //   'a' => [
+     * //     'a.a' => ['item', 3, 4],
+     * //     'a.b' => ['item', 7, 8],
+     * //   ]
+     * // ],
+     * ```
      *
      * @param int|null $length
      * @param mixed $replacement
      * @return Chain|array
+     *
+     * @see Func::spliceTail()
+     * @see ChainFuncSplice::tail()
      */
     public function tail(?int $length = null, $replacement = [])
     {

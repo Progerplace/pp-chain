@@ -1,11 +1,16 @@
 <?php
 
+use Ru\Progerplace\Chain\Cf;
 use Ru\Progerplace\Chain\Ch;
 use Ru\Progerplace\Chain\Chain;
 use Ru\Progerplace\Chain\ChainFunc;
+use Ru\Progerplace\Chain\F;
 use Ru\Progerplace\Chain\Func;
+use function Ru\Progerplace\Chain\Cf;
+use function Ru\Progerplace\Chain\Ch;
 
 require_once __DIR__ . '/../vendor/autoload.php';
+//require_once __DIR__ . '/../app-files/aliases.php';
 
 $arr = [1, 2, 3];
 //$arr = [
@@ -17,7 +22,27 @@ $arr = [1, 2, 3];
 //    ['a' => 4, 'b' => 5, 'c' => 6, 'd' => 7],
 //];
 
-$res = Ch::from($arr)->map(fn($item) => $item)->toArray();
+
+Chain::from($arr)->map(fn(int $item) => $item + 1)->toArray();
+Ch::from($arr)->map(fn(int $item) => $item + 1)->toArray();
+Ch($arr)->map(fn(int $item) => $item + 1)->toArray();
+
+ChainFunc::from($arr)->map(fn(int $item) => $item + 1);
+Cf::from($arr)->map(fn(int $item) => $item + 1);
+Cf($arr)->map(fn(int $item) => $item + 1);
+
+Func::map($arr, fn(int $item) => $item + 1);
+F::map($arr, fn(int $item) => $item + 1);
+
+
+
+//$res = Ch($arr)->map(fn($item) => $item + 10)->toArray();
+//$res = Cf($arr)->map(fn($item) => $item + 20);
+
+
+//$res = Ch::from($arr)
+//    ->map(fn($item) => $item)->toArray();
+//$r = Func::map($arr, fn($item) => $item);
 
 //$res = ChFrom([1, 2, 3])->toArray();
 

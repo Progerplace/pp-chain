@@ -18,10 +18,20 @@ class ChainPrepend
     }
 
     /**
-     * Подробности {@see Func::prependMerge()}
+     * Добавить элементы в начало массива. Если элемент итерируемый - то будет выполнено слияние. Неитерируемые элементы будут добавлены как есть.
+     *
+     * ```
+     * $arr = [1, 2];
+     *
+     * Ch::from($arr)->prepend->merge(3, [4, 5, [6, 7]])->toArray();
+     * // [1, 2, 3, 4, 5, [6, 7]]
+     * ```
      *
      * @param mixed ...$items
      * @return Chain
+     *
+     * @see ChainFuncPrepend::merge()
+     * @see Func::prependMerge()
      */
     public function merge(...$items): Chain
     {
@@ -32,10 +42,20 @@ class ChainPrepend
     }
 
     /**
-     * Подробности {@see Func::prependMergeFromJson()}
+     * Декодировать json и добавить в начало массива (с распаковкой итерируемых элементов).
+     *
+     * ```
+     * $arr = [1, 2];
+     *
+     * Ch::from($arr)->prepend->mergeFromJson('[3,4,5,[6,7]]')->toArray();
+     * // [1, 2, 3, 4, 5, [6, 7]]
+     * ```
      *
      * @param string $json
      * @return Chain
+     *
+     * @see ChainFuncPrepend::mergeFromJson()
+     * @see Func::prependMergeFromJson()
      */
     public function mergeFromJson(string $json): Chain
     {
@@ -46,11 +66,21 @@ class ChainPrepend
     }
 
     /**
-     * Подробности {@see Func::prependMergeFromString()}
+     * Конвертировать строку в массив и добавить в начало массива (с распаковкой итерируемых элементов)
+     *
+     * ```
+     * $arr = [1, 2];
+     *
+     * Ch::from($arr)->prepend->mergeFromString('3,4,5', ',')->toArray();
+     * // [1, 2, 3, 4, 5]
+     * ```
      *
      * @param string $str
      * @param string $delimiter
      * @return Chain
+     *
+     * @see ChainFuncPrepend::mergeFromString()
+     * @see Func::prependMergeFromString()
      */
     public function mergeFromString(string $str, string $delimiter): Chain
     {

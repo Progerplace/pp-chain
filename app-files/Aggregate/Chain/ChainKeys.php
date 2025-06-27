@@ -21,27 +21,20 @@ class ChainKeys
     public ChainKeysCase $case;
 
     /**
-     * Подробности {@see Func::keysGetList()}
+     * Изменить значения ключей. Повторяющиеся значения будут молча перезаписаны.
      *
-     * @return array|Chain
-     */
-    public function getList()
-    {
-        if ($this->chain->elemsLevel == 0) {
-            return Func::keysGetList($this->array);
-        }
-
-        $this->array = ArrayAction::doAction($this->array, $this->chain->elemsLevel, [Func::class, 'keysGetList']);
-        $this->chain->resetElemsLevel();
-
-        return $this->chain->replaceWith($this->array);
-    }
-
-    /**
-     * Подробности {@see Func::keysMap()}
+     * Параметры callback функции - `$key`, `$element`
+     *
+     * ```
+     * Ch::from(['a' =>1, 'b' => 2, 'c' => 3])->keys->map(fn(string $key, int $item) => $key . $item)->toArray();
+     * // ['a1' =>1, 'b2' => 2, 'c3' => 3];
+     * ```
      *
      * @param callable $callback
      * @return Chain
+     *
+     * @see ChainFuncKeys::map()
+     * @see Func::keysMap()
      */
     public function map(callable $callback): Chain
     {
@@ -52,10 +45,26 @@ class ChainKeys
     }
 
     /**
-     * Подробности {@see Func::keysFromField()}
+     * Заполнить ключи из значений поля. Повторяющиеся значения будут молча перезаписаны.
+     *
+     * ```
+     * $arr = [
+     *   ['id' => 10, 'val' => 'a'],
+     *   ['id' => 20, 'val' => 'b'],
+     * ]
+     *
+     * Ch::from($arr)->keys->fromField('id')->toArray();
+     * // $arr = [
+     * //   10 => ['id' => 10, 'val' => 'a'],
+     * //   20 => ['id' => 20, 'val' => 'b'],
+     * // ]
+     * ```
      *
      * @param string|int $field
      * @return Chain
+     *
+     * @see ChainFuncKeys::fromField()
+     * @see Func::keysFromField()
      */
     public function fromField($field): Chain
     {
@@ -66,10 +75,35 @@ class ChainKeys
     }
 
     /**
-     * Подробности {@see Func::keysGet())}
+     * Получить ключ по номеру в массиве. Нумерация начинается с 0.
+     *
+     * ```
+     * Ch::from(['a' => 1, 'b' => 2])->keys->get(1);
+     * // 'b'
+     * ```
+     * Для дочерних элементов:
+     * ```
+     * $arr = [
+     *   'a' => [
+     *     'a.a' => ['a' => 10, 'b' => 'a'],
+     *     'a.b' => ['a' => 10, 'b' => 'a']
+     *   ],
+     * ];
+     *
+     * Ch::from($arr)->elems->elems->keys->get(1)->toArray();
+     * // [
+     * //   'a' => [
+     * //     'a.a' => 'b',
+     * //     'a.b' => 'b',
+     * //   ]
+     * // ],
+     * ```
      *
      * @param int $number
      * @return int|string|null|Chain
+     *
+     * @see ChainFuncKeys::get()
+     * @see Func::keysGet()
      */
     public function get(int $number)
     {
@@ -84,9 +118,35 @@ class ChainKeys
     }
 
     /**
-     * Подробности {@see Func::keysGetFirst())}
+     * Получить первый ключ массива.
+     *
+     * ```
+     * Ch::from(['a' => 1, 'b' => 2])->keys->getFirst();
+     * // 'a'
+     * ```
+     * Для дочерних элементов:
+     * ```
+     * $arr = [
+     *   'a' => [
+     *     'a.a' => ['a' => 10, 'b' => 'a'],
+     *     'a.b' => ['a' => 10, 'b' => 'a']
+     *   ],
+     * ];
+     *
+     * Ch::from($arr)->elems->elems->keys->getFirst->toArray();
+     * // [
+     * //   'a' => [
+     * //     'a.a' => 'a',
+     * //     'a.b' => 'a',
+     * //   ]
+     * // ],
+     * ```
      *
      * @return int|string|null|Chain
+     *
+     * @link https://www.php.net/manual/ru/function.array-key-first.php php.net - Php.net - array_key_first
+     * @see ChainFuncKeys::getFirst()
+     * @see Func::keysGetFirst()
      */
     public function getFirst()
     {
@@ -101,9 +161,35 @@ class ChainKeys
     }
 
     /**
-     * Подробности {@see Func::keysGetLast())}
+     * Получить последний ключ массива.
+     *
+     * ```
+     * Ch::from(['a' => 1, 'b' => 2])->keys->getLast();
+     * // 'b'
+     * ```
+     * Для дочерних элементов:
+     * ```
+     * $arr = [
+     *   'a' => [
+     *     'a.a' => ['a' => 10, 'b' => 'a'],
+     *     'a.b' => ['a' => 10, 'b' => 'a']
+     *   ],
+     * ];
+     *
+     * Ch::from($arr)->elems->elems->keys->getLast->toArray();
+     * // [
+     * //   'a' => [
+     * //     'a.a' => 'b',
+     * //     'a.b' => 'b',
+     * //   ]
+     * // ],
+     * ```
      *
      * @return int|string|null|Chain
+     *
+     * @link https://www.php.net/manual/ru/function.array-key-last.php php.net - Php.net - array_key_last
+     * @see ChainFuncKeys::getLast()
+     * @see Func::keysGetLast()
      */
     public function getLast()
     {
